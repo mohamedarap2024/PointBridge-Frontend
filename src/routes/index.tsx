@@ -1,0 +1,244 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowRight, Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Reveal } from "@/components/site/Reveal";
+import { HeroSlider } from "@/components/site/HeroSlider";
+import { ServiceCard } from "@/components/site/ServiceCard";
+import { ContentCard } from "@/components/site/ContentCard";
+import { SectionHeader } from "@/components/site/SectionHeader";
+import { services, partners } from "@/lib/site-data";
+import { images } from "@/lib/images";
+import {
+  resolveBlogPosts,
+  resolvePublications,
+  resolveQuickLinkImage,
+  usePublicTestimonials,
+  useSiteImageMap,
+} from "@/lib/use-site-content";
+
+export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "PointBridge Consulting — Rigorous Insights in Complex Settings" },
+      { name: "description", content: "Independent consulting in governance, peace-building, M&E, research, human capital and ICT — trusted by UN agencies, donors and governments." },
+      { property: "og:title", content: "PointBridge Consulting" },
+      { property: "og:description", content: "Rigorous, actionable insights in complex and fragile settings." },
+      { property: "og:url", content: "/" },
+    ],
+    links: [{ rel: "canonical", href: "/" }],
+  }),
+  component: Home,
+});
+
+const quickLinkMeta = [
+  { to: "/blog", label: "Stories & insights", sub: "Blogs", key: "blog" as const },
+  { to: "/training", label: "Catalogue & apply", sub: "Training", key: "training" as const },
+  { to: "/publications", label: "Reports & briefs", sub: "Research", key: "publications" as const },
+  { to: "/projects", label: "News & highlights", sub: "Events", key: "projects" as const },
+] as const;
+
+function Home() {
+  const { data: imageMap } = useSiteImageMap();
+  const { data: testimonials = [] } = usePublicTestimonials();
+  const blogPosts = resolveBlogPosts(imageMap);
+  const publicationItems = resolvePublications(imageMap);
+  const quickLinks = quickLinkMeta.map((item) => ({
+    ...item,
+    image: resolveQuickLinkImage(item.key, imageMap),
+  }));
+  const clientsImage = imageMap?.["section.clients"] ?? images.clients;
+
+  return (
+    <>
+      <HeroSlider />
+
+      {/* Quick access cards — bcf.so style */}
+      <section className="relative z-10 -mt-20 px-4 sm:px-6 lg:px-8 md:-mt-28">
+        <div className="mx-auto grid max-w-7xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {quickLinks.map((item, i) => (
+            <Reveal key={item.to} delay={i * 0.06}>
+              <Link to={item.to} className="group block overflow-hidden rounded-xl border border-border/50 bg-card shadow-elegant">
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  <img
+                    src={item.image}
+                    alt=""
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[oklch(0.18_0.07_260/0.92)] via-[oklch(0.18_0.07_260/0.35)] to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-secondary">{item.sub}</p>
+                    <p className="mt-1 text-sm font-bold leading-snug sm:text-base">{item.label}</p>
+                    <span className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-white/75 group-hover:text-white">
+                      Read more… <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      {/* What We Do */}
+      <section className="section-padding mt-8 bg-[oklch(0.98_0.005_255)]">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <Reveal>
+            <SectionHeader
+              eyebrow="What We Do"
+              title="Comprehensive consulting solutions"
+              description="Designed to transform your organization and drive sustainable growth across all sectors"
+            />
+          </Reveal>
+          <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {services.map((s, i) => (
+              <Reveal key={s.slug} delay={i * 0.04}>
+                <ServiceCard
+                  title={s.title}
+                  short={s.short}
+                  image={images.services[s.slug as keyof typeof images.services]}
+                  icon={s.icon}
+                  slug={s.slug}
+                />
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Latest News & Publications */}
+      <section className="section-padding border-y border-border bg-white">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <Reveal>
+            <SectionHeader
+              eyebrow="Insights & Media"
+              title="Latest News & Publications"
+              description="Stay up to date with our most recent insights and updates. Explore our three latest stories and publications, carefully selected and presented in chronological order, with the newest featured first."
+            />
+          </Reveal>
+
+          <div className="mt-12 grid gap-12 lg:grid-cols-2">
+            <div>
+              <div className="mb-5 flex items-end justify-between border-b border-border pb-4">
+                <div>
+                  <h3 className="text-lg font-bold">Latest News</h3>
+                  <p className="text-sm text-muted-foreground">Newest Articles First</p>
+                </div>
+                <Button asChild variant="link" size="sm" className="text-primary px-0">
+                  <Link to="/blog">View All News</Link>
+                </Button>
+              </div>
+              <div className="space-y-4">
+                {blogPosts.slice(0, 3).map((p, i) => (
+                  <Reveal key={p.slug} delay={i * 0.06}>
+                    <ContentCard
+                      layout="horizontal"
+                      image={p.image}
+                      category="news"
+                      title={p.title}
+                      excerpt={p.excerpt}
+                      date={p.date}
+                      href="/blog"
+                    />
+                  </Reveal>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <div className="mb-5 flex items-end justify-between border-b border-border pb-4">
+                <div>
+                  <h3 className="text-lg font-bold">Latest Publications</h3>
+                  <p className="text-sm text-muted-foreground">Newest Briefs & Reports First</p>
+                </div>
+                <Button asChild variant="link" size="sm" className="text-primary px-0">
+                  <Link to="/publications">View All Publications</Link>
+                </Button>
+              </div>
+              <div className="space-y-4">
+                {publicationItems.slice(0, 3).map((p, i) => (
+                  <Reveal key={p.slug} delay={i * 0.06}>
+                    <ContentCard
+                      layout="horizontal"
+                      image={p.image}
+                      category={p.category}
+                      title={p.title}
+                      excerpt={p.excerpt}
+                      date={p.date}
+                      href="/publications"
+                      cta="Open document"
+                    />
+                  </Reveal>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Clients */}
+      <section className="relative isolate overflow-hidden">
+        <div className="absolute inset-0 -z-10">
+          <img src={clientsImage} alt="" className="h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-[oklch(0.18_0.07_260/0.9)]" />
+        </div>
+        <div className="section-padding text-white">
+          <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+            <Reveal>
+              <SectionHeader
+                theme="light"
+                eyebrow="Trusted organizations"
+                title="Some Of Our Clients"
+                description="We proudly collaborate with leading institutions and organizations to deliver impactful solutions and drive sustainable growth across the Horn of Africa."
+              />
+            </Reveal>
+            <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+              {partners.map((p) => (
+                <div
+                  key={p}
+                  className="flex min-h-[72px] items-center justify-center rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-center text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:border-secondary/40 hover:bg-white/15"
+                >
+                  {p}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="section-padding bg-[oklch(0.98_0.005_255)]">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <Reveal>
+            <SectionHeader eyebrow="Client voices" title="What our clients say" />
+          </Reveal>
+          <div className="mt-10 grid gap-6 md:grid-cols-3">
+            {testimonials.map((t, i) => (
+              <Reveal key={t.name} delay={i * 0.08}>
+                <Card className="h-full border-border/60 bg-white shadow-sm">
+                  <CardContent className="p-6 sm:p-8">
+                    <div className="flex gap-0.5 text-secondary">
+                      {Array.from({ length: 5 }).map((_, j) => (
+                        <Star key={j} className="h-4 w-4 fill-current" />
+                      ))}
+                    </div>
+                    <p className="mt-4 text-sm leading-relaxed text-muted-foreground">"{t.quote}"</p>
+                    <div className="mt-6 flex items-center gap-3">
+                      <div className="h-12 w-12 overflow-hidden rounded-full bg-muted ring-2 ring-secondary/20">
+                        <img src={images.team[i]} alt="" className="h-full w-full object-cover" />
+                      </div>
+                      <div>
+                        <div className="font-semibold text-sm">{t.name}</div>
+                        <div className="text-xs text-muted-foreground">{t.role}</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
