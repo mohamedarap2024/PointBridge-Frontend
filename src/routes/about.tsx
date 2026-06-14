@@ -6,11 +6,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import { teamMembers, timeline } from "@/lib/site-data";
 import { images } from "@/lib/images";
 
+const aboutUsParagraphs = [
+  "Founded in 2019, PointBridge Consulting is an independent advisory and evaluation firm headquartered in East Africa. We partner with UN agencies, international NGOs, bilateral donors, and foundations to deliver rigorous, evidence-based solutions in some of the world's most complex and fragile environments.",
+  "Our expertise spans strategic policy, peace-building, audit and risk management, human capital development, research and analytics, monitoring and evaluation, and business development services. We also provide security and related services, translation and interpretation in multiple languages, and tailored training and capacity development programmes.",
+  "Over the years, we have delivered more than 80 HR systems (including recruitment services), trained 5,000+ professionals, and supported 40+ institutions across governance, humanitarian response, health, education, and economic development. Our research and analytics portfolio now includes research, Proposal and report writing, impact assessments, and advanced data-driven insights.",
+  "What sets us apart is our commitment to context-sensitivity, local ownership, and sustainable capacity development. Every engagement is tailored to the unique realities of the communities we serve, enabling us to build long-term relationships and deliver lasting impact.",
+] as const;
+
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
       { title: "About — PointBridge Consulting" },
-      { name: "description", content: "Our story, mission, vision, values and leadership team. PointBridge Consulting since 2019." },
+      { name: "description", content: aboutUsParagraphs[0] },
       { property: "og:title", content: "About — PointBridge Consulting" },
       { property: "og:description", content: "A bridge between evidence and action — built since 2019." },
       { property: "og:url", content: "/about" },
@@ -36,6 +43,19 @@ function About() {
         title="Building bridges between evidence, policy and people"
         description="We are an independent consulting firm working with governments, multilaterals, donors and NGOs in some of the world's most complex environments."
       />
+
+      <section className="section-padding border-b border-border bg-white">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+          <Reveal>
+            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">About Us</h2>
+            <div className="mt-6 space-y-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
+              {aboutUsParagraphs.map((paragraph) => (
+                <p key={paragraph.slice(0, 40)}>{paragraph}</p>
+              ))}
+            </div>
+          </Reveal>
+        </div>
+      </section>
 
       <section className="section-padding">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid md:grid-cols-3 gap-6">

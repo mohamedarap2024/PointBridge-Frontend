@@ -60,7 +60,14 @@ export function Footer() {
               </li>
               <li className="flex items-start gap-2.5">
                 <Globe className="mt-0.5 h-4 w-4 shrink-0 text-secondary" />
-                <span>www.pointbridgeconsulting.com</span>
+                <a
+                  href="https://pointbridgeconsulting.com"
+                  className="hover:text-secondary transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  pointbridgeconsulting.com
+                </a>
               </li>
             </ul>
           </div>
