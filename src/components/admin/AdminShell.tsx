@@ -2,8 +2,6 @@ import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import {
   Bell,
-  ChevronLeft,
-  ChevronRight,
   HelpCircle,
   ImageIcon,
   LayoutDashboard,
@@ -12,6 +10,8 @@ import {
   Mail,
   Menu,
   MessageSquareQuote,
+  PanelLeft,
+  PanelLeftClose,
   Search,
   Settings,
   Users,
@@ -173,11 +173,17 @@ export function AdminShell() {
     <>
       <div
         className={cn(
-          "border-b border-white/10 px-5 py-6",
-          collapsed && !isMobile ? "px-3 text-center" : "",
+          "flex items-start border-b border-white/10 px-4 py-5",
+          collapsed && !isMobile ? "flex-col items-center gap-3 px-2" : "justify-between gap-2",
         )}
       >
-        <Link to="/admin" className="block transition-opacity hover:opacity-90">
+        <Link
+          to="/admin"
+          className={cn(
+            "block min-w-0 transition-opacity hover:opacity-90",
+            collapsed && !isMobile && "text-center",
+          )}
+        >
           {collapsed && !isMobile ? (
             <img
               src="/pointbridge-logo.png"
@@ -191,6 +197,26 @@ export function AdminShell() {
             </>
           )}
         </Link>
+
+        {!isMobile && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={toggleCollapsed}
+                aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+                className="shrink-0 rounded-lg p-1.5 text-white/55 transition-colors hover:bg-white/10 hover:text-white"
+              >
+                {collapsed ? (
+                  <PanelLeft className="h-[18px] w-[18px]" strokeWidth={1.75} />
+                ) : (
+                  <PanelLeftClose className="h-[18px] w-[18px]" strokeWidth={1.75} />
+                )}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="right">{collapsed ? "Expand sidebar" : "Collapse sidebar"}</TooltipContent>
+          </Tooltip>
+        )}
       </div>
 
       <nav className="flex-1 space-y-0.5 px-3 py-4">
@@ -234,14 +260,6 @@ export function AdminShell() {
             className="relative hidden shrink-0 flex-col overflow-hidden bg-[oklch(0.16_0.06_260)] text-white lg:flex"
           >
             {sidebarContent()}
-            <button
-              type="button"
-              onClick={toggleCollapsed}
-              aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-              className="absolute -right-3 top-[4.5rem] z-10 flex h-6 w-6 items-center justify-center rounded-full border border-border/30 bg-white text-foreground shadow-md transition-transform hover:scale-110"
-            >
-              {collapsed ? <ChevronRight className="h-3.5 w-3.5" /> : <ChevronLeft className="h-3.5 w-3.5" />}
-            </button>
           </motion.aside>
 
           {mobileOpen && (
@@ -272,6 +290,20 @@ export function AdminShell() {
           <div className="flex min-w-0 flex-1 flex-col">
             <header className="sticky top-0 z-20 border-b border-border/60 bg-white">
               <div className="flex items-center gap-3 px-4 py-3 sm:gap-4 sm:px-6 lg:px-8">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="hidden shrink-0 text-muted-foreground lg:inline-flex"
+                  onClick={toggleCollapsed}
+                  aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+                >
+                  {collapsed ? (
+                    <PanelLeft className="h-[18px] w-[18px]" strokeWidth={1.75} />
+                  ) : (
+                    <PanelLeftClose className="h-[18px] w-[18px]" strokeWidth={1.75} />
+                  )}
+                </Button>
+
                 <Button
                   variant="ghost"
                   size="icon"
