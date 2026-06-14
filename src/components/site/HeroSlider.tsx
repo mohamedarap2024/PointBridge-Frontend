@@ -91,12 +91,13 @@ export function HeroSlider() {
                   src={item.image}
                   alt=""
                   className={cn(
-                    "h-full w-full object-cover transition-transform duration-[8000ms] ease-out",
+                    "h-full w-full object-cover brightness-[1.06] contrast-[1.04] saturate-[1.08] transition-transform duration-[8000ms] ease-out",
                     current === index ? "scale-105" : "scale-100",
                   )}
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-[oklch(0.14_0.07_260/0.95)] via-[oklch(0.22_0.08_260/0.88)] to-[oklch(0.28_0.10_256/0.75)]" />
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,oklch(0.68_0.19_144/0.15),transparent_50%)]" />
+                {/* Light left gradient — keeps text readable without hiding the photo */}
+                <div className="absolute inset-0 bg-gradient-to-r from-[oklch(0.14_0.07_260/0.62)] via-[oklch(0.14_0.07_260/0.22)] to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[oklch(0.14_0.07_260/0.35)] via-transparent to-transparent" />
               </div>
             </CarouselItem>
           ))}
@@ -110,7 +111,7 @@ export function HeroSlider() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-              className="pointer-events-auto max-w-4xl text-white"
+              className="pointer-events-auto max-w-4xl text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.45)]"
             >
               {slide.eyebrow && (
                 <motion.p
@@ -137,7 +138,7 @@ export function HeroSlider() {
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.25 }}
-                className="mt-4 max-w-xl text-sm leading-relaxed text-white/90 sm:mt-6 sm:text-base md:text-lg"
+                className="mt-4 max-w-xl text-sm leading-relaxed text-white/95 sm:mt-6 sm:text-base md:text-lg"
               >
                 {slide.description}
               </motion.p>
