@@ -1,20 +1,33 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import {
+  Bell,
   ChevronLeft,
   ChevronRight,
+  HelpCircle,
   ImageIcon,
   LayoutDashboard,
+  LayoutGrid,
   LogOut,
   Mail,
   Menu,
   MessageSquareQuote,
+  Search,
+  Settings,
   Users,
   X,
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Logo } from "@/components/site/Logo";
+import { useEffect, useMemo, useState } from "react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
@@ -27,6 +40,11 @@ const navItems = [
   { to: "/admin/testimonials", label: "Feedback", icon: MessageSquareQuote },
   { to: "/admin/images", label: "Images", icon: ImageIcon },
   { to: "/admin/users", label: "Users", icon: Users },
+] as const;
+
+const bottomNavItems = [
+  { to: "/admin/users", label: "Settings", icon: Settings },
+  { href: "/contact", label: "Support", icon: HelpCircle },
 ] as const;
 
 function NavItem({
@@ -46,14 +64,14 @@ function NavItem({
       to={item.to}
       onClick={onClick}
       className={cn(
-        "group flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-all duration-300",
+        "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
         collapsed && "justify-center px-2",
         active
-          ? "bg-gradient-to-r from-primary/90 to-primary text-white shadow-md shadow-primary/25"
-          : "text-white/75 hover:bg-white/10 hover:text-white hover:translate-x-0.5",
+          ? "bg-secondary text-secondary-foreground shadow-sm"
+          : "text-white/70 hover:bg-white/8 hover:text-white",
       )}
     >
-      <Icon className={cn("h-5 w-5 shrink-0", active && "text-white")} />
+      <Icon className="h-[18px] w-[18px] shrink-0" />
       {!collapsed && <span className="truncate">{item.label}</span>}
     </Link>
   );
@@ -70,11 +88,63 @@ function NavItem({
   return link;
 }
 
+function BottomNavItem({
+  item,
+  collapsed,
+  onClick,
+}: {
+  item: (typeof bottomNavItems)[number];
+  collapsed: boolean;
+  onClick?: () => void;
+}) {
+  const Icon = item.icon;
+  const className = cn(
+    "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-white/55 transition-colors hover:bg-white/8 hover:text-white/90",
+    collapsed && "justify-center px-2",
+  );
+
+  const content =
+    "href" in item ? (
+      <a href={item.href} className={className} onClick={onClick}>
+        <Icon className="h-[18px] w-[18px] shrink-0" />
+        {!collapsed && <span>{item.label}</span>}
+      </a>
+    ) : (
+      <Link to={item.to} className={className} onClick={onClick}>
+        <Icon className="h-[18px] w-[18px] shrink-0" />
+        {!collapsed && <span>{item.label}</span>}
+      </Link>
+    );
+
+  if (collapsed) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>{content}</TooltipTrigger>
+        <TooltipContent side="right">{item.label}</TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return content;
+}
+
+function getInitials(name: string) {
+  return (
+    name
+      .split(" ")
+      .map((part) => part[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() || "AD"
+  );
+}
+
 export function AdminShell() {
   const { user, logout } = useAuth();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -93,31 +163,38 @@ export function AdminShell() {
     });
   };
 
+  const filteredNav = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return navItems;
+    return navItems.filter((item) => item.label.toLowerCase().includes(q));
+  }, [search]);
+
   const sidebarContent = (isMobile = false) => (
     <>
       <div
         className={cn(
-          "flex items-center border-b border-white/10 px-4 py-5",
-          collapsed && !isMobile ? "justify-center px-2" : "gap-3",
+          "border-b border-white/10 px-5 py-6",
+          collapsed && !isMobile ? "px-3 text-center" : "",
         )}
       >
-        <Link to="/admin" className={cn("shrink-0 transition-transform hover:scale-105", collapsed && !isMobile && "mx-auto")}>
+        <Link to="/admin" className="block transition-opacity hover:opacity-90">
           {collapsed && !isMobile ? (
-            <img src="/pointbridge-logo.png" alt="PointBridge" className="h-10 w-10 object-contain brightness-0 invert" />
+            <img
+              src="/pointbridge-logo.png"
+              alt="PointBridge"
+              className="mx-auto h-9 w-9 object-contain brightness-0 invert"
+            />
           ) : (
-            <Logo variant="footer" className="max-h-10 brightness-0 invert" />
+            <>
+              <p className="text-lg font-bold tracking-tight text-white">PointBridge</p>
+              <p className="mt-0.5 text-xs text-white/45">Control Center</p>
+            </>
           )}
         </Link>
-        {(!collapsed || isMobile) && (
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-white">Admin Panel</p>
-            <p className="text-xs text-white/55">PointBridge Consulting</p>
-          </div>
-        )}
       </div>
 
-      <nav className="flex-1 space-y-1 p-3">
-        {navItems.map((item) => {
+      <nav className="flex-1 space-y-0.5 px-3 py-4">
+        {filteredNav.map((item) => {
           const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
           return (
             <NavItem
@@ -131,56 +208,42 @@ export function AdminShell() {
         })}
       </nav>
 
-      <div className="border-t border-white/10 p-3">
-        {(!collapsed || isMobile) && (
-          <div className="mb-3 rounded-xl bg-white/5 px-3 py-3 backdrop-blur-sm">
-            <p className="truncate text-sm font-medium text-white">{user?.name}</p>
-            <p className="truncate text-xs text-white/55">{user?.email}</p>
-          </div>
-        )}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              className={cn(
-                "w-full text-white/80 transition-all duration-300 hover:bg-red-500/15 hover:text-red-200",
-                collapsed && !isMobile ? "justify-center px-2" : "justify-start",
-              )}
-              onClick={logout}
-            >
-              <LogOut className={cn("h-4 w-4", (!collapsed || isMobile) && "mr-2")} />
-              {(!collapsed || isMobile) && "Log out"}
-            </Button>
-          </TooltipTrigger>
-          {collapsed && !isMobile && <TooltipContent side="right">Log out</TooltipContent>}
-        </Tooltip>
+      <div className="space-y-0.5 border-t border-white/10 px-3 py-4">
+        {bottomNavItems.map((item) => (
+          <BottomNavItem
+            key={item.label}
+            item={item}
+            collapsed={collapsed && !isMobile}
+            onClick={isMobile ? () => setMobileOpen(false) : undefined}
+          />
+        ))}
       </div>
     </>
   );
 
+  const roleLabel = user?.role === "admin" ? "Super Administrator" : "User";
+
   return (
     <TooltipProvider delayDuration={0}>
-      <div className="min-h-dvh bg-[linear-gradient(160deg,oklch(0.97_0.012_255)_0%,oklch(0.99_0.005_255)_45%,oklch(0.96_0.02_230)_100%)]">
+      <div className="min-h-dvh bg-[oklch(0.97_0.005_255)]">
         <div className="flex min-h-dvh">
-          {/* Desktop sidebar */}
           <motion.aside
             initial={false}
-            animate={{ width: collapsed ? 76 : 288 }}
-            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="relative hidden shrink-0 flex-col overflow-hidden border-r border-white/10 bg-[linear-gradient(180deg,oklch(0.16_0.06_260)_0%,oklch(0.20_0.07_258)_100%)] text-white lg:flex"
+            animate={{ width: collapsed ? 72 : 260 }}
+            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            className="relative hidden shrink-0 flex-col overflow-hidden bg-[oklch(0.16_0.06_260)] text-white lg:flex"
           >
             {sidebarContent()}
             <button
               type="button"
               onClick={toggleCollapsed}
               aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-              className="absolute -right-3 top-20 z-10 flex h-6 w-6 items-center justify-center rounded-full border border-border/40 bg-white text-primary shadow-md transition-transform hover:scale-110"
+              className="absolute -right-3 top-[4.5rem] z-10 flex h-6 w-6 items-center justify-center rounded-full border border-border/30 bg-white text-foreground shadow-md transition-transform hover:scale-110"
             >
               {collapsed ? <ChevronRight className="h-3.5 w-3.5" /> : <ChevronLeft className="h-3.5 w-3.5" />}
             </button>
           </motion.aside>
 
-          {/* Mobile sidebar overlay */}
           {mobileOpen && (
             <>
               <button
@@ -190,10 +253,9 @@ export function AdminShell() {
                 onClick={() => setMobileOpen(false)}
               />
               <motion.aside
-                initial={{ x: -300 }}
+                initial={{ x: -280 }}
                 animate={{ x: 0 }}
-                exit={{ x: -300 }}
-                className="fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-[linear-gradient(180deg,oklch(0.16_0.06_260)_0%,oklch(0.20_0.07_258)_100%)] text-white shadow-2xl lg:hidden"
+                className="fixed inset-y-0 left-0 z-50 flex w-[260px] flex-col bg-[oklch(0.16_0.06_260)] text-white shadow-2xl lg:hidden"
               >
                 <button
                   type="button"
@@ -208,28 +270,83 @@ export function AdminShell() {
           )}
 
           <div className="flex min-w-0 flex-1 flex-col">
-            <header className="sticky top-0 z-20 border-b border-border/50 bg-white/85 px-4 py-3 backdrop-blur-xl sm:px-6 lg:px-8">
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="lg:hidden"
-                    onClick={() => setMobileOpen(true)}
-                    aria-label="Open menu"
-                  >
-                    <Menu className="h-5 w-5" />
-                  </Button>
-                  <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary/70 sm:text-xs">
-                      Admin Panel
-                    </p>
-                    <h1 className="text-base font-bold text-foreground sm:text-lg">PointBridge Control Center</h1>
-                  </div>
-                </div>
-                <Button asChild variant="outline" size="sm" className="rounded-full transition-transform hover:scale-105">
-                  <Link to="/">View Website</Link>
+            <header className="sticky top-0 z-20 border-b border-border/60 bg-white">
+              <div className="flex items-center gap-3 px-4 py-3 sm:gap-4 sm:px-6 lg:px-8">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="shrink-0 lg:hidden"
+                  onClick={() => setMobileOpen(true)}
+                  aria-label="Open menu"
+                >
+                  <Menu className="h-5 w-5" />
                 </Button>
+
+                <p className="hidden shrink-0 text-sm font-semibold text-foreground sm:block lg:text-base">
+                  PointBridge Consulting
+                </p>
+
+                <div className="relative mx-auto hidden max-w-md flex-1 md:block">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Search systems..."
+                    className="h-10 rounded-full border-border/60 bg-muted/40 pl-9 text-sm"
+                  />
+                </div>
+
+                <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
+                  <Button variant="ghost" size="icon" className="rounded-full text-muted-foreground" aria-label="Notifications">
+                    <Bell className="h-[18px] w-[18px]" />
+                  </Button>
+                  <Button asChild variant="ghost" size="icon" className="rounded-full text-muted-foreground">
+                    <Link to="/admin" aria-label="Dashboard">
+                      <LayoutGrid className="h-[18px] w-[18px]" />
+                    </Link>
+                  </Button>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        type="button"
+                        className="ml-1 flex items-center gap-2 rounded-full py-1 pl-1 pr-2 transition-colors hover:bg-muted/60 sm:gap-3 sm:pr-3"
+                      >
+                        <Avatar className="h-9 w-9 border border-border/60">
+                          <AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">
+                            {getInitials(user?.name ?? "Admin")}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="hidden text-left sm:block">
+                          <span className="block text-sm font-semibold leading-tight text-foreground">
+                            {user?.name ?? "Admin User"}
+                          </span>
+                          <span className="block text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                            {roleLabel}
+                          </span>
+                        </span>
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-52">
+                      <div className="px-2 py-1.5">
+                        <p className="text-sm font-medium">{user?.name}</p>
+                        <p className="text-xs text-muted-foreground">{user?.email}</p>
+                      </div>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to="/">View Website</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin/users">Settings</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={logout} className="text-destructive focus:text-destructive">
+                        <LogOut className="mr-2 h-4 w-4" />
+                        Log out
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </div>
             </header>
 
