@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Shield } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Logo } from "@/components/site/Logo";
 import { AuthField } from "@/components/site/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,11 +37,11 @@ function AdminLoginPage() {
   };
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-[radial-gradient(circle_at_top,oklch(0.92_0.04_255),oklch(0.98_0.01_255))] px-4 py-10">
-      <Card className="w-full max-w-md border-border/60 shadow-elegant">
+    <div className="flex min-h-dvh items-center justify-center bg-[linear-gradient(160deg,oklch(0.16_0.06_260)_0%,oklch(0.28_0.09_256)_50%,oklch(0.42_0.12_230)_100%)] px-4 py-10">
+      <Card className="w-full max-w-md border-white/20 bg-white/95 shadow-2xl backdrop-blur-sm">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-            <Shield className="h-7 w-7" />
+          <div className="mx-auto mb-4 flex justify-center">
+            <Logo variant="navbar" className="max-h-16" />
           </div>
           <CardTitle className="text-2xl">Admin Login</CardTitle>
           <CardDescription>Sign in to manage messages, feedback, images and users.</CardDescription>
