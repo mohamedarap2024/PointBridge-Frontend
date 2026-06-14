@@ -40,7 +40,9 @@ const navIcons: Record<string, LucideIcon> = {
 };
 
 const navItemClass =
-  "inline-flex shrink-0 items-center gap-1 rounded-lg px-2 py-2 text-[13px] font-medium transition-all duration-300 2xl:gap-1.5 2xl:px-3 2xl:text-sm";
+  "inline-flex shrink-0 items-center gap-1.5 rounded-lg px-1.5 py-2 text-xs font-medium transition-all duration-300 xl:px-2 xl:text-[13px] 2xl:gap-2 2xl:px-3 2xl:text-sm";
+
+const navIconClass = "inline-flex h-3.5 w-3.5 shrink-0 opacity-80 xl:h-4 xl:w-4";
 
 function NavLink({
   to,
@@ -70,7 +72,7 @@ function NavLink({
           : "text-foreground/80 hover:bg-primary/5 hover:text-primary hover:-translate-y-px",
       )}
     >
-      {Icon && <Icon className="hidden h-4 w-4 shrink-0 opacity-80 2xl:inline-flex" />}
+      {Icon && <Icon className={navIconClass} />}
       {label}
     </Link>
   );
@@ -153,7 +155,7 @@ export function Navbar() {
                       isAboutActive ? "text-primary" : "text-foreground/80",
                     )}
                   >
-                    <Info className="hidden h-4 w-4 opacity-80 2xl:inline-flex" />
+                    <Info className={navIconClass} />
                     About
                     <ChevronDown className="h-3.5 w-3.5 opacity-60 transition-transform duration-300 group-data-[state=open]:rotate-180" />
                   </DropdownMenuTrigger>
@@ -177,7 +179,7 @@ export function Navbar() {
                       isServicesActive ? "text-primary" : "text-foreground/80",
                     )}
                   >
-                    <Briefcase className="hidden h-4 w-4 opacity-80 2xl:inline-flex" />
+                    <Briefcase className={navIconClass} />
                     Services
                     <ChevronDown className="h-3.5 w-3.5 opacity-60" />
                   </DropdownMenuTrigger>
@@ -206,21 +208,21 @@ export function Navbar() {
                 asChild
                 variant="outline"
                 size="sm"
-                className="h-9 rounded-full border-primary/40 px-3 text-primary shadow-sm transition-all duration-300 hover:scale-105 hover:bg-primary/5 xl:px-4 2xl:min-w-[104px] 2xl:px-5"
+                className="h-9 min-w-[96px] justify-center rounded-full border-primary/40 px-4 text-primary shadow-sm transition-all duration-300 hover:scale-105 hover:bg-primary/5 xl:min-w-[104px] xl:px-5"
               >
                 <Link to="/login">
-                  <LogIn className="h-4 w-4 shrink-0 2xl:mr-1.5" />
-                  <span className="hidden 2xl:inline">Sign In</span>
+                  <LogIn className="mr-1.5 h-4 w-4 shrink-0" />
+                  Sign In
                 </Link>
               </Button>
               <Button
                 asChild
                 size="sm"
-                className="h-9 rounded-full bg-primary px-3 shadow-md transition-all duration-300 hover:scale-105 hover:bg-primary/90 xl:px-4 2xl:min-w-[104px] 2xl:px-5"
+                className="h-9 min-w-[96px] justify-center rounded-full bg-primary px-4 shadow-md transition-all duration-300 hover:scale-105 hover:bg-primary/90 xl:min-w-[104px] xl:px-5"
               >
                 <Link to="/signup">
-                  <UserPlus className="h-4 w-4 shrink-0 2xl:mr-1.5" />
-                  <span className="hidden 2xl:inline">Sign Up</span>
+                  <UserPlus className="mr-1.5 h-4 w-4 shrink-0" />
+                  Sign Up
                 </Link>
               </Button>
             </div>
