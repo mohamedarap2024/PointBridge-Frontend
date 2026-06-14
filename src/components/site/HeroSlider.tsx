@@ -9,8 +9,8 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
-import { heroSlides as defaultHeroSlides } from "@/lib/images";
 import { cn } from "@/lib/utils";
+import { preloadImageUrlsAsync, readCachedImageMap } from "@/lib/site-image-cache";
 import { useHeroSlides } from "@/lib/use-site-content";
 
 function SlideTitle({ title, highlight, line2 }: { title: string; highlight?: string; line2?: string }) {
@@ -45,12 +45,39 @@ function SlideTitle({ title, highlight, line2 }: { title: string; highlight?: st
   );
 }
 
+function HeroSliderPlaceholder() {
+  return (
+    <section className="relative isolate min-h-[70vh] overflow-hidden bg-[oklch(0.16_0.06_260)] sm:min-h-[78vh] lg:min-h-[85vh] xl:min-h-[88vh]">
+      <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-[oklch(0.20_0.07_258)] via-[oklch(0.28_0.09_256)] to-[oklch(0.35_0.10_250)]" />
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+      </div>
+    </section>
+  );
+}
+
 export function HeroSlider() {
-  const { slides } = useHeroSlides();
-  const heroSlides = slides.length ? slides : defaultHeroSlides;
+  const { slides: heroSlides, isLoading: mapLoading } = useHeroSlides();
+  const [imagesReady, setImagesReady] = useState(() => !!readCachedImageMap());
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
+
+  useEffect(() => {
+    if (mapLoading) {
+      setImagesReady(false);
+      return;
+    }
+
+    let cancelled = false;
+    preloadImageUrlsAsync(heroSlides.map((slide) => slide.image)).then(() => {
+      if (!cancelled) setImagesReady(true);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [heroSlides, mapLoading]);
 
   useEffect(() => {
     if (!api) return;
@@ -73,6 +100,10 @@ export function HeroSlider() {
 
     return () => window.clearInterval(timer);
   }, [api, paused]);
+
+  if (mapLoading || !imagesReady) {
+    return <HeroSliderPlaceholder />;
+  }
 
   const slide = heroSlides[current];
 

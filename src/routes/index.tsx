@@ -13,11 +13,13 @@ import {
   resolveBlogPosts,
   resolvePublications,
   resolveQuickLinkImage,
+  siteImagesQueryOptions,
   usePublicTestimonials,
   useSiteImageMap,
 } from "@/lib/use-site-content";
 
 export const Route = createFileRoute("/")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(siteImagesQueryOptions()),
   head: () => ({
     meta: [
       { title: "PointBridge Consulting — Rigorous Insights in Complex Settings" },

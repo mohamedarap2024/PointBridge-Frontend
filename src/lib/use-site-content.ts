@@ -1,13 +1,39 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchPublicImages, fetchPublicTestimonials } from "@/lib/admin-api";
 import { heroSlides, images } from "@/lib/images";
+import {
+  preloadImageUrls,
+  readCachedImageMap,
+  writeCachedImageMap,
+} from "@/lib/site-image-cache";
 import { blogPosts, publications, testimonials as staticTestimonials } from "@/lib/site-data";
+
+function getInitialImageData() {
+  const map = readCachedImageMap();
+  if (!map) return undefined;
+
+  preloadImageUrls(Object.values(map));
+  return { items: [], map };
+}
+
+export function siteImagesQueryOptions() {
+  return {
+    queryKey: ["site-images"] as const,
+    queryFn: async () => {
+      const data = await fetchPublicImages();
+      writeCachedImageMap(data.map);
+      preloadImageUrls(Object.values(data.map));
+      return data;
+    },
+    initialData: getInitialImageData,
+    staleTime: 30_000,
+    refetchOnMount: true as const,
+  };
+}
 
 export function useSiteImageMap() {
   return useQuery({
-    queryKey: ["site-images"],
-    queryFn: fetchPublicImages,
-    staleTime: 60_000,
+    ...siteImagesQueryOptions(),
     select: (data) => data.map,
   });
 }
@@ -21,14 +47,18 @@ export function useSiteImages() {
 }
 
 export function useHeroSlides() {
-  const { getImage, isLoading } = useSiteImages();
+  const { data: map, isPending } = useSiteImageMap();
 
   const slides = heroSlides.map((slide, index) => ({
     ...slide,
-    image: getImage(`hero.slide.${index + 1}`, slide.image),
+    image: map?.[`hero.slide.${index + 1}`] ?? slide.image,
   }));
 
-  return { slides, isLoading };
+  return {
+    slides,
+    /** True only on first visit with no cached image map */
+    isLoading: isPending && !map,
+  };
 }
 
 export function usePublicTestimonials() {
