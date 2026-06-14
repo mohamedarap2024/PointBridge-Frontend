@@ -78,14 +78,14 @@ export function HeroSlider() {
 
   return (
     <section
-      className="relative isolate min-h-[88vh] overflow-hidden"
+      className="relative isolate min-h-[70vh] overflow-hidden sm:min-h-[78vh] lg:min-h-[85vh] xl:min-h-[88vh]"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <Carousel opts={{ loop: true }} setApi={setApi} className="min-h-[88vh]">
-        <CarouselContent className="-ml-0 min-h-[88vh]">
+      <Carousel opts={{ loop: true }} setApi={setApi} className="min-h-[70vh] sm:min-h-[78vh] lg:min-h-[85vh] xl:min-h-[88vh]">
+        <CarouselContent className="-ml-0 min-h-[70vh] sm:min-h-[78vh] lg:min-h-[85vh] xl:min-h-[88vh]">
           {heroSlides.map((item, index) => (
-            <CarouselItem key={item.title} className="relative min-h-[88vh] basis-full pl-0">
+            <CarouselItem key={item.title} className="relative min-h-[70vh] basis-full pl-0 sm:min-h-[78vh] lg:min-h-[85vh] xl:min-h-[88vh]">
               <div className="absolute inset-0 -z-10">
                 <img
                   src={item.image}
@@ -102,33 +102,55 @@ export function HeroSlider() {
           ))}
         </CarouselContent>
 
-        <div className="pointer-events-none absolute inset-0 mx-auto flex max-w-7xl flex-col justify-center px-4 py-32 sm:px-6 lg:px-8 md:py-40">
+        <div className="pointer-events-none absolute inset-0 mx-auto flex max-w-7xl flex-col justify-center px-4 py-24 sm:px-6 sm:py-28 md:py-32 lg:px-8 lg:py-36 xl:py-40">
           <AnimatePresence mode="wait">
             <motion.div
               key={current}
-              initial={{ opacity: 0, y: 24 }}
+              initial={{ opacity: 0, y: 32 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -16 }}
-              transition={{ duration: 0.45, ease: "easeOut" }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
               className="pointer-events-auto max-w-4xl text-white"
             >
               {slide.eyebrow && (
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-secondary">{slide.eyebrow}</p>
+                <motion.p
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="text-[10px] font-semibold uppercase tracking-[0.2em] text-secondary sm:text-xs"
+                >
+                  {slide.eyebrow}
+                </motion.p>
               )}
-              <h1
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15, duration: 0.6 }}
                 className={cn(
-                  "max-w-4xl text-4xl font-bold leading-[1.08] tracking-tight sm:text-5xl md:text-6xl lg:text-[4.25rem]",
-                  slide.eyebrow ? "mt-4" : "mt-0",
+                  "max-w-4xl text-3xl font-bold leading-[1.1] tracking-tight xs:text-[2rem] sm:text-4xl md:text-5xl lg:text-6xl xl:text-[4.25rem]",
+                  slide.eyebrow ? "mt-3 sm:mt-4" : "mt-0",
                 )}
               >
                 <SlideTitle title={slide.title} highlight={slide.highlight} line2={slide.titleLine2} />
-              </h1>
-              <p className="mt-6 max-w-xl text-base leading-relaxed text-white/90 sm:text-lg">{slide.description}</p>
-              <div className="mt-8 flex flex-wrap gap-3">
+              </motion.h1>
+              <motion.p
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25 }}
+                className="mt-4 max-w-xl text-sm leading-relaxed text-white/90 sm:mt-6 sm:text-base md:text-lg"
+              >
+                {slide.description}
+              </motion.p>
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.35 }}
+                className="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap"
+              >
                 <Button
                   asChild
                   size="lg"
-                  className="rounded-full bg-secondary px-8 text-secondary-foreground shadow-lg hover:bg-secondary/90"
+                  className="w-full rounded-full bg-secondary px-6 text-secondary-foreground shadow-lg transition-all duration-300 hover:scale-105 hover:bg-secondary/90 sm:w-auto sm:px-8"
                 >
                   <Link to={slide.primaryTo}>
                     {slide.primaryLabel} <ArrowRight className="ml-2 h-4 w-4" />
@@ -138,7 +160,7 @@ export function HeroSlider() {
                   asChild
                   size="lg"
                   variant="outline"
-                  className="rounded-full border-white/50 bg-white/10 px-8 text-white backdrop-blur-sm hover:bg-white/20 hover:text-white"
+                  className="w-full rounded-full border-white/50 bg-white/10 px-6 text-white backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:bg-white/20 hover:text-white sm:w-auto sm:px-8"
                 >
                   <Link to={slide.secondaryTo}>
                     {slide.secondaryLabel === "Watch Video" && (
@@ -147,12 +169,12 @@ export function HeroSlider() {
                     {slide.secondaryLabel}
                   </Link>
                 </Button>
-              </div>
+              </motion.div>
             </motion.div>
           </AnimatePresence>
         </div>
 
-        <div className="pointer-events-none absolute inset-x-0 bottom-8 flex items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="pointer-events-none absolute inset-x-0 bottom-6 flex items-center justify-between px-4 sm:bottom-8 sm:px-6 lg:px-8">
           <div className="pointer-events-auto mx-auto flex items-center gap-2">
             {heroSlides.map((_, index) => (
               <button
@@ -175,7 +197,7 @@ export function HeroSlider() {
           size="icon"
           aria-label="Previous slide"
           onClick={() => api?.scrollPrev()}
-          className="absolute left-4 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 rounded-full border-white/30 bg-black/20 text-white backdrop-blur-sm hover:bg-black/35 hover:text-white md:inline-flex lg:left-8"
+          className="absolute left-2 top-1/2 z-10 inline-flex h-10 w-10 -translate-y-1/2 rounded-full border-white/30 bg-black/20 text-white backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:bg-black/35 hover:text-white sm:left-4 sm:h-11 sm:w-11 lg:left-8"
         >
           <ChevronLeft className="h-5 w-5" />
         </Button>
@@ -185,7 +207,7 @@ export function HeroSlider() {
           size="icon"
           aria-label="Next slide"
           onClick={() => api?.scrollNext()}
-          className="absolute right-4 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 rounded-full border-white/30 bg-black/20 text-white backdrop-blur-sm hover:bg-black/35 hover:text-white md:inline-flex lg:right-8"
+          className="absolute right-2 top-1/2 z-10 inline-flex h-10 w-10 -translate-y-1/2 rounded-full border-white/30 bg-black/20 text-white backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:bg-black/35 hover:text-white sm:right-4 sm:h-11 sm:w-11 lg:right-8"
         >
           <ChevronRight className="h-5 w-5" />
         </Button>

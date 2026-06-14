@@ -1,5 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
   Briefcase,
@@ -27,6 +28,7 @@ import { Logo } from "./Logo";
 import { SocialLinks } from "./SocialLinks";
 import { TopBar } from "./TopBar";
 import { aboutLinks, mainNav, serviceLinks } from "@/lib/navigation";
+import { cn } from "@/lib/utils";
 
 const navIcons: Record<string, LucideIcon> = {
   "/": Home,
@@ -38,7 +40,7 @@ const navIcons: Record<string, LucideIcon> = {
 };
 
 const navItemClass =
-  "inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-medium transition-colors lg:px-2.5 lg:py-2 xl:gap-1.5 xl:px-3 xl:text-sm";
+  "inline-flex shrink-0 items-center gap-1 rounded-lg px-2 py-2 text-[13px] font-medium transition-all duration-300 2xl:gap-1.5 2xl:px-3 2xl:text-sm";
 
 function NavLink({
   to,
@@ -60,58 +62,102 @@ function NavLink({
       to={to}
       hash={hash}
       onClick={onClick}
-      className={`relative ${navItemClass} ${
+      className={cn(
+        "relative",
+        navItemClass,
         active
-          ? "text-primary after:absolute after:bottom-0 after:left-2 after:right-2 after:h-0.5 after:rounded-full after:bg-secondary xl:after:left-3 xl:after:right-3"
-          : "text-foreground/80 hover:bg-primary/5 hover:text-primary"
-      }`}
+          ? "text-primary after:absolute after:bottom-0 after:left-2 after:right-2 after:h-0.5 after:rounded-full after:bg-secondary after:transition-all 2xl:after:left-3 2xl:after:right-3"
+          : "text-foreground/80 hover:bg-primary/5 hover:text-primary hover:-translate-y-px",
+      )}
     >
-      {Icon && <Icon className="hidden h-3.5 w-3.5 shrink-0 opacity-80 xl:inline-flex xl:h-4 xl:w-4" />}
+      {Icon && <Icon className="hidden h-4 w-4 shrink-0 opacity-80 2xl:inline-flex" />}
       {label}
     </Link>
   );
 }
 
+const menuVariants = {
+  closed: { opacity: 0, height: 0 },
+  open: { opacity: 1, height: "auto", transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } },
+};
+
+const itemVariants = {
+  closed: { opacity: 0, x: -16 },
+  open: (i: number) => ({
+    opacity: 1,
+    x: 0,
+    transition: { delay: i * 0.04, duration: 0.3, ease: [0.22, 1, 0.36, 1] },
+  }),
+};
+
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   const isAboutActive = pathname === "/about" || pathname === "/projects";
   const isServicesActive = pathname === "/services";
 
+  useEffect(() => {
+    setOpen(false);
+    setAboutOpen(false);
+    setServicesOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
     <header className="sticky top-0 z-50">
       <TopBar />
-      <nav className="border-b border-border/60 bg-gradient-to-b from-white to-[oklch(0.98_0.005_255)] shadow-[0_4px_24px_oklch(0.24_0.07_260/0.08)]">
-        <div className="mx-auto grid min-h-[72px] max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-3 px-4 py-2 sm:min-h-[76px] sm:px-6 sm:gap-4 lg:min-h-[80px] lg:px-8 lg:gap-5">
+      <nav
+        className={cn(
+          "border-b border-border/60 bg-gradient-to-b from-white to-[oklch(0.98_0.005_255)] transition-shadow duration-500",
+          scrolled && "nav-scrolled",
+        )}
+      >
+        <div className="mx-auto flex min-h-[64px] max-w-7xl items-center justify-between gap-3 px-4 py-2 sm:min-h-[72px] sm:px-6 xl:min-h-[76px] xl:px-8">
           <Link
             to="/"
-            className="inline-flex shrink-0 items-center py-1 transition-opacity hover:opacity-90"
+            className="inline-flex shrink-0 items-center py-1 transition-transform duration-300 hover:scale-[1.02] hover:opacity-90"
             aria-label="PointBridge Consulting — Home"
           >
             <Logo variant="navbar" />
           </Link>
 
-          <div className="hidden min-w-0 items-center justify-center lg:flex">
-            <ul className="flex flex-wrap items-center justify-center gap-0.5 xl:gap-1">
+          {/* Desktop nav — xl+ only, single row, no wrap */}
+          <div className="hidden min-w-0 flex-1 items-center justify-center xl:flex">
+            <ul className="flex flex-nowrap items-center justify-center gap-0.5 2xl:gap-1">
               <li>
                 <NavLink to="/" label="Home" active={pathname === "/"} icon={Home} />
               </li>
-
               <li>
                 <DropdownMenu>
                   <DropdownMenuTrigger
-                    className={`${navItemClass} outline-none hover:bg-primary/5 hover:text-primary focus-visible:ring-2 focus-visible:ring-primary/30 ${
-                      isAboutActive ? "text-primary" : "text-foreground/80"
-                    }`}
+                    className={cn(
+                      navItemClass,
+                      "outline-none hover:bg-primary/5 hover:text-primary focus-visible:ring-2 focus-visible:ring-primary/30",
+                      isAboutActive ? "text-primary" : "text-foreground/80",
+                    )}
                   >
-                    <Info className="hidden h-3.5 w-3.5 opacity-80 xl:inline-flex xl:h-4 xl:w-4" />
+                    <Info className="hidden h-4 w-4 opacity-80 2xl:inline-flex" />
                     About
-                    <ChevronDown className="h-3 w-3 opacity-60 xl:h-3.5 xl:w-3.5" />
+                    <ChevronDown className="h-3.5 w-3.5 opacity-60 transition-transform duration-300 group-data-[state=open]:rotate-180" />
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="min-w-[200px]">
+                  <DropdownMenuContent align="start" className="min-w-[200px] animate-in fade-in-0 zoom-in-95">
                     {aboutLinks.map((l) => (
                       <DropdownMenuItem key={l.label} asChild>
                         <Link to={l.to} hash={"hash" in l ? l.hash : undefined} className="cursor-pointer">
@@ -122,19 +168,20 @@ export function Navbar() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               </li>
-
               <li>
                 <DropdownMenu>
                   <DropdownMenuTrigger
-                    className={`${navItemClass} outline-none hover:bg-primary/5 hover:text-primary focus-visible:ring-2 focus-visible:ring-primary/30 ${
-                      isServicesActive ? "text-primary" : "text-foreground/80"
-                    }`}
+                    className={cn(
+                      navItemClass,
+                      "outline-none hover:bg-primary/5 hover:text-primary focus-visible:ring-2 focus-visible:ring-primary/30",
+                      isServicesActive ? "text-primary" : "text-foreground/80",
+                    )}
                   >
-                    <Briefcase className="hidden h-3.5 w-3.5 opacity-80 xl:inline-flex xl:h-4 xl:w-4" />
+                    <Briefcase className="hidden h-4 w-4 opacity-80 2xl:inline-flex" />
                     Services
-                    <ChevronDown className="h-3 w-3 opacity-60 xl:h-3.5 xl:w-3.5" />
+                    <ChevronDown className="h-3.5 w-3.5 opacity-60" />
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="max-h-[320px] min-w-[280px] overflow-y-auto">
+                  <DropdownMenuContent align="start" className="max-h-[320px] min-w-[280px] overflow-y-auto animate-in fade-in-0 zoom-in-95">
                     {serviceLinks.map((l) => (
                       <DropdownMenuItem key={l.hash} asChild>
                         <Link to={l.to} hash={l.hash} className="cursor-pointer text-sm">
@@ -145,123 +192,201 @@ export function Navbar() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               </li>
-
               {mainNav.slice(1).map((l) => (
                 <li key={l.to}>
-                  <NavLink
-                    to={l.to}
-                    label={l.label}
-                    active={pathname === l.to}
-                    icon={navIcons[l.to]}
-                  />
+                  <NavLink to={l.to} label={l.label} active={pathname === l.to} icon={navIcons[l.to]} />
                 </li>
               ))}
             </ul>
           </div>
 
-          <div className="flex shrink-0 items-center justify-end gap-3 sm:gap-4 lg:gap-3 lg:border-l lg:border-border/40 lg:pl-4 xl:gap-4 xl:pl-5">
-            <div className="hidden items-center gap-3 sm:flex lg:gap-3 xl:gap-4">
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3 xl:gap-3 2xl:gap-4">
+            <div className="hidden items-center gap-2 md:flex xl:gap-3">
               <Button
                 asChild
                 variant="outline"
                 size="sm"
-                className="h-9 min-w-[104px] justify-center rounded-full border-primary/40 px-4 text-primary shadow-sm hover:bg-primary/5 xl:h-10 xl:min-w-[112px] xl:px-5"
+                className="h-9 rounded-full border-primary/40 px-3 text-primary shadow-sm transition-all duration-300 hover:scale-105 hover:bg-primary/5 xl:px-4 2xl:min-w-[104px] 2xl:px-5"
               >
                 <Link to="/login">
-                  <LogIn className="mr-1.5 h-4 w-4 shrink-0" />
-                  Sign In
+                  <LogIn className="h-4 w-4 shrink-0 2xl:mr-1.5" />
+                  <span className="hidden 2xl:inline">Sign In</span>
                 </Link>
               </Button>
               <Button
                 asChild
                 size="sm"
-                className="h-9 min-w-[104px] justify-center rounded-full bg-primary px-4 shadow-md hover:bg-primary/90 xl:h-10 xl:min-w-[112px] xl:px-5"
+                className="h-9 rounded-full bg-primary px-3 shadow-md transition-all duration-300 hover:scale-105 hover:bg-primary/90 xl:px-4 2xl:min-w-[104px] 2xl:px-5"
               >
                 <Link to="/signup">
-                  <UserPlus className="mr-1.5 h-4 w-4 shrink-0" />
-                  Sign Up
+                  <UserPlus className="h-4 w-4 shrink-0 2xl:mr-1.5" />
+                  <span className="hidden 2xl:inline">Sign Up</span>
                 </Link>
               </Button>
             </div>
             <Button
               variant="ghost"
               size="icon"
-              className="h-10 w-10 shrink-0 lg:hidden"
+              className="h-10 w-10 shrink-0 transition-transform duration-300 hover:scale-105 xl:hidden"
               onClick={() => setOpen((v) => !v)}
-              aria-label="Toggle menu"
+              aria-label={open ? "Close menu" : "Open menu"}
+              aria-expanded={open}
             >
               {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
           </div>
         </div>
 
-        {open && (
-          <div className="border-t border-border bg-background lg:hidden">
-            <ul className="space-y-1 px-4 py-4">
-              <li>
-                <Link to="/" onClick={() => setOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-muted">
-                  <Home className="h-4 w-4" /> Home
-                </Link>
-              </li>
-              {/* About & Services accordions - same as before */}
-              <li>
-                <button type="button" onClick={() => setAboutOpen((v) => !v)} className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-muted">
-                  <span className="flex items-center gap-2"><Info className="h-4 w-4" /> About</span>
-                  <ChevronDown className={`h-4 w-4 transition-transform ${aboutOpen ? "rotate-180" : ""}`} />
-                </button>
-                {aboutOpen && (
-                  <ul className="ml-3 mt-1 space-y-1 border-l border-border pl-3">
-                    {aboutLinks.map((l) => (
-                      <li key={l.label}>
-                        <Link to={l.to} hash={"hash" in l ? l.hash : undefined} onClick={() => setOpen(false)} className="block rounded-md px-3 py-2 text-sm text-muted-foreground hover:text-primary">
-                          {l.label}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </li>
-              <li>
-                <button type="button" onClick={() => setServicesOpen((v) => !v)} className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-muted">
-                  <span className="flex items-center gap-2"><Briefcase className="h-4 w-4" /> Services</span>
-                  <ChevronDown className={`h-4 w-4 transition-transform ${servicesOpen ? "rotate-180" : ""}`} />
-                </button>
-                {servicesOpen && (
-                  <ul className="ml-3 mt-1 max-h-48 space-y-1 overflow-y-auto border-l border-border pl-3">
-                    {serviceLinks.map((l) => (
-                      <li key={l.hash}>
-                        <Link to={l.to} hash={l.hash} onClick={() => setOpen(false)} className="block rounded-md px-3 py-2 text-sm text-muted-foreground hover:text-primary">
-                          {l.label}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </li>
-              {mainNav.slice(1).map((l) => {
-                const Icon = navIcons[l.to];
-                return (
-                  <li key={l.to}>
-                    <Link to={l.to} onClick={() => setOpen(false)} className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-muted">
-                      {Icon && <Icon className="h-4 w-4" />} {l.label}
+        {/* Mobile + tablet menu */}
+        <AnimatePresence>
+          {open && (
+            <>
+              <motion.button
+                type="button"
+                aria-label="Close menu overlay"
+                className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm xl:hidden"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setOpen(false)}
+              />
+              <motion.div
+                className="relative z-50 overflow-hidden border-t border-border bg-background xl:hidden"
+                initial="closed"
+                animate="open"
+                exit="closed"
+                variants={menuVariants}
+              >
+                <ul className="max-h-[calc(100dvh-8rem)] space-y-1 overflow-y-auto px-4 py-4 pb-8">
+                  <motion.li custom={0} variants={itemVariants} initial="closed" animate="open">
+                    <Link
+                      to="/"
+                      onClick={() => setOpen(false)}
+                      className={cn(
+                        "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-300",
+                        pathname === "/"
+                          ? "bg-primary/10 text-primary"
+                          : "hover:bg-muted hover:translate-x-1",
+                      )}
+                    >
+                      <Home className="h-4 w-4 shrink-0" /> Home
                     </Link>
-                  </li>
-                );
-              })}
-              <li className="grid grid-cols-2 gap-3 pt-3 sm:hidden">
-                <Button asChild variant="outline" className="h-11 rounded-full">
-                  <Link to="/login" onClick={() => setOpen(false)}><LogIn className="mr-1.5 h-4 w-4" /> Sign In</Link>
-                </Button>
-                <Button asChild className="h-11 rounded-full bg-primary">
-                  <Link to="/signup" onClick={() => setOpen(false)}><UserPlus className="mr-1.5 h-4 w-4" /> Sign Up</Link>
-                </Button>
-              </li>
-              <li className="flex justify-center pt-4">
-                <SocialLinks variant="footer" />
-              </li>
-            </ul>
-          </div>
-        )}
+                  </motion.li>
+
+                  <motion.li custom={1} variants={itemVariants} initial="closed" animate="open">
+                    <button
+                      type="button"
+                      onClick={() => setAboutOpen((v) => !v)}
+                      className="flex w-full items-center justify-between rounded-xl px-4 py-3 text-sm font-medium transition-all hover:bg-muted"
+                    >
+                      <span className="flex items-center gap-3">
+                        <Info className="h-4 w-4" /> About
+                      </span>
+                      <ChevronDown className={cn("h-4 w-4 transition-transform duration-300", aboutOpen && "rotate-180")} />
+                    </button>
+                    <AnimatePresence>
+                      {aboutOpen && (
+                        <motion.ul
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="ml-4 mt-1 space-y-1 overflow-hidden border-l-2 border-primary/20 pl-4"
+                        >
+                          {aboutLinks.map((l) => (
+                            <li key={l.label}>
+                              <Link
+                                to={l.to}
+                                hash={"hash" in l ? l.hash : undefined}
+                                onClick={() => setOpen(false)}
+                                className="block rounded-lg px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-primary/5 hover:text-primary"
+                              >
+                                {l.label}
+                              </Link>
+                            </li>
+                          ))}
+                        </motion.ul>
+                      )}
+                    </AnimatePresence>
+                  </motion.li>
+
+                  <motion.li custom={2} variants={itemVariants} initial="closed" animate="open">
+                    <button
+                      type="button"
+                      onClick={() => setServicesOpen((v) => !v)}
+                      className="flex w-full items-center justify-between rounded-xl px-4 py-3 text-sm font-medium transition-all hover:bg-muted"
+                    >
+                      <span className="flex items-center gap-3">
+                        <Briefcase className="h-4 w-4" /> Services
+                      </span>
+                      <ChevronDown className={cn("h-4 w-4 transition-transform duration-300", servicesOpen && "rotate-180")} />
+                    </button>
+                    <AnimatePresence>
+                      {servicesOpen && (
+                        <motion.ul
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="ml-4 mt-1 max-h-52 space-y-1 overflow-y-auto overflow-x-hidden border-l-2 border-primary/20 pl-4"
+                        >
+                          {serviceLinks.map((l) => (
+                            <li key={l.hash}>
+                              <Link
+                                to={l.to}
+                                hash={l.hash}
+                                onClick={() => setOpen(false)}
+                                className="block rounded-lg px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-primary/5 hover:text-primary"
+                              >
+                                {l.label}
+                              </Link>
+                            </li>
+                          ))}
+                        </motion.ul>
+                      )}
+                    </AnimatePresence>
+                  </motion.li>
+
+                  {mainNav.slice(1).map((l, i) => {
+                    const Icon = navIcons[l.to];
+                    return (
+                      <motion.li key={l.to} custom={i + 3} variants={itemVariants} initial="closed" animate="open">
+                        <Link
+                          to={l.to}
+                          onClick={() => setOpen(false)}
+                          className={cn(
+                            "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-300",
+                            pathname === l.to
+                              ? "bg-primary/10 text-primary"
+                              : "hover:bg-muted hover:translate-x-1",
+                          )}
+                        >
+                          {Icon && <Icon className="h-4 w-4 shrink-0" />}
+                          {l.label}
+                        </Link>
+                      </motion.li>
+                    );
+                  })}
+
+                  <motion.li custom={10} variants={itemVariants} initial="closed" animate="open" className="grid grid-cols-2 gap-3 pt-4 md:hidden">
+                    <Button asChild variant="outline" className="h-11 rounded-full transition-transform hover:scale-[1.02]">
+                      <Link to="/login" onClick={() => setOpen(false)}>
+                        <LogIn className="mr-1.5 h-4 w-4" /> Sign In
+                      </Link>
+                    </Button>
+                    <Button asChild className="h-11 rounded-full bg-primary transition-transform hover:scale-[1.02]">
+                      <Link to="/signup" onClick={() => setOpen(false)}>
+                        <UserPlus className="mr-1.5 h-4 w-4" /> Sign Up
+                      </Link>
+                    </Button>
+                  </motion.li>
+
+                  <motion.li custom={11} variants={itemVariants} initial="closed" animate="open" className="flex justify-center pt-4">
+                    <SocialLinks variant="footer" />
+                  </motion.li>
+                </ul>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
       </nav>
     </header>
   );

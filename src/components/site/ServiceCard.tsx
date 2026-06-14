@@ -12,7 +12,7 @@ type ServiceCardProps = {
 
 export function ServiceCard({ title, short, image, icon: Icon, slug }: ServiceCardProps) {
   return (
-    <article className="group overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-elegant">
+    <article className="group hover-lift overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
       <div className="relative aspect-[16/10] overflow-hidden">
         <img
           src={image}

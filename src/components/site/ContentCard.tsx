@@ -42,7 +42,7 @@ export function ContentCard({
 
   if (layout === "horizontal") {
     return (
-      <article className="group overflow-hidden rounded-xl border border-border bg-card transition-all hover:border-primary/20 hover:shadow-elegant">
+      <article className="group hover-lift overflow-hidden rounded-xl border border-border bg-card hover:border-primary/20">
         <div className="flex flex-col sm:flex-row">
           <div className="relative h-44 shrink-0 overflow-hidden sm:h-auto sm:w-44 md:w-52">
             <img
@@ -69,7 +69,7 @@ export function ContentCard({
   }
 
   return (
-    <article className="group overflow-hidden rounded-2xl border border-border bg-card transition-all hover:shadow-elegant">
+    <article className="group hover-lift overflow-hidden rounded-2xl border border-border bg-card">
       <div className="relative aspect-[16/10] overflow-hidden">
         <img
           src={image}

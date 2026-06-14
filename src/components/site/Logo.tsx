@@ -8,7 +8,7 @@ type LogoProps = {
 
 const variantStyles = {
   navbar:
-    "h-11 w-auto max-h-11 min-w-[100px] max-w-[160px] object-contain object-left sm:h-12 sm:max-h-12 sm:max-w-[180px] lg:h-14 lg:max-h-14 lg:max-w-[200px] xl:h-16 xl:max-h-16 xl:max-w-[220px] 2xl:h-[72px] 2xl:max-h-[72px] 2xl:max-w-[240px]",
+    "h-10 w-auto max-h-10 min-w-[88px] max-w-[140px] object-contain object-left xs:h-11 xs:max-h-11 sm:h-12 sm:max-h-12 sm:max-w-[180px] lg:h-14 lg:max-h-14 lg:max-w-[200px] xl:h-16 xl:max-h-16 xl:max-w-[220px] 2xl:h-[72px] 2xl:max-h-[72px] 2xl:max-w-[240px]",
   footer:
     "h-11 w-auto max-h-11 max-w-[240px] object-contain object-left sm:h-12 sm:max-h-12 sm:max-w-[280px] md:max-w-[320px]",
 } as const;

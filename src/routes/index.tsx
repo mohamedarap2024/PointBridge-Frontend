@@ -54,11 +54,11 @@ function Home() {
       <HeroSlider />
 
       {/* Quick access cards — bcf.so style */}
-      <section className="relative z-10 -mt-20 px-4 sm:px-6 lg:px-8 md:-mt-28">
-        <div className="mx-auto grid max-w-7xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="relative z-10 -mt-12 px-4 sm:-mt-16 sm:px-6 md:-mt-20 lg:-mt-28 lg:px-8">
+        <div className="mx-auto grid max-w-7xl gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
           {quickLinks.map((item, i) => (
-            <Reveal key={item.to} delay={i * 0.06}>
-              <Link to={item.to} className="group block overflow-hidden rounded-xl border border-border/50 bg-card shadow-elegant">
+            <Reveal key={item.to} delay={i * 0.06} variant={i % 2 === 0 ? "up" : "scale"}>
+              <Link to={item.to} className="group hover-lift block overflow-hidden rounded-xl border border-border/50 bg-card shadow-elegant">
                 <div className="relative aspect-[4/3] overflow-hidden">
                   <img
                     src={item.image}
@@ -90,7 +90,7 @@ function Home() {
               description="Designed to transform your organization and drive sustainable growth across all sectors"
             />
           </Reveal>
-          <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-8 grid gap-4 sm:mt-12 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
             {services.map((s, i) => (
               <Reveal key={s.slug} delay={i * 0.04}>
                 <ServiceCard
@@ -117,7 +117,7 @@ function Home() {
             />
           </Reveal>
 
-          <div className="mt-12 grid gap-12 lg:grid-cols-2">
+          <div className="mt-8 grid gap-8 sm:mt-12 lg:grid-cols-2 lg:gap-12">
             <div>
               <div className="mb-5 flex items-end justify-between border-b border-border pb-4">
                 <div>
