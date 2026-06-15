@@ -19,7 +19,13 @@ import {
 } from "@/lib/use-site-content";
 
 export const Route = createFileRoute("/")({
-  loader: ({ context }) => context.queryClient.ensureQueryData(siteImagesQueryOptions()),
+  loader: async ({ context }) => {
+    try {
+      await context.queryClient.ensureQueryData(siteImagesQueryOptions());
+    } catch {
+      /* Homepage still loads with static image fallbacks */
+    }
+  },
   head: () => ({
     meta: [
       { title: "PointBridge Consulting — Rigorous Insights in Complex Settings" },

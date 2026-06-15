@@ -9,6 +9,8 @@ import {
 import { blogPosts, publications, testimonials as staticTestimonials } from "@/lib/site-data";
 
 function getInitialImageData() {
+  if (typeof window === "undefined") return undefined;
+
   const map = readCachedImageMap();
   if (!map) return undefined;
 
@@ -20,14 +22,21 @@ export function siteImagesQueryOptions() {
   return {
     queryKey: ["site-images"] as const,
     queryFn: async () => {
-      const data = await fetchPublicImages();
-      writeCachedImageMap(data.map);
-      preloadImageUrls(Object.values(data.map));
-      return data;
+      try {
+        const data = await fetchPublicImages();
+        writeCachedImageMap(data.map);
+        preloadImageUrls(Object.values(data.map));
+        return data;
+      } catch {
+        const cached = readCachedImageMap();
+        if (cached) return { items: [], map: cached };
+        return { items: [], map: {} };
+      }
     },
-    initialData: getInitialImageData,
+    initialData: getInitialImageData(),
     staleTime: 30_000,
     refetchOnMount: true as const,
+    retry: 1,
   };
 }
 
