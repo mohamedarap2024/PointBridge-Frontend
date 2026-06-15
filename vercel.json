@@ -1,12 +1,4 @@
 {
-  "redirects": [
-    {
-      "source": "/:path*",
-      "has": [{ "type": "host", "value": "www.pointbridgeconsulting.com" }],
-      "destination": "https://pointbridgeconsulting.com/:path*",
-      "permanent": true
-    }
-  ],
   "rewrites": [
     {
       "source": "/sitemap.xml",
