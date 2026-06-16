@@ -7,6 +7,16 @@ type CachedPayload = {
   updatedAt: number;
 };
 
+/** Smaller URLs for faster hero / card loads (especially Unsplash). */
+export function optimizeImageUrl(url: string, width = 1280) {
+  if (!url) return url;
+  if (url.includes("images.unsplash.com")) {
+    const base = url.split("?")[0];
+    return `${base}?w=${width}&q=75&auto=format&fit=crop`;
+  }
+  return url;
+}
+
 export function readCachedImageMap(): Record<string, string> | undefined {
   try {
     const raw = localStorage.getItem(CACHE_KEY);
@@ -34,29 +44,19 @@ export function writeCachedImageMap(map: Record<string, string>) {
   }
 }
 
-export function preloadImageUrls(urls: string[]) {
+export function preloadImageUrls(urls: string[], width = 1280) {
   const unique = [...new Set(urls.filter(Boolean))];
   unique.forEach((url) => {
     const img = new Image();
     img.decoding = "async";
-    img.src = url;
+    img.src = optimizeImageUrl(url, width);
   });
 }
 
-export function preloadImageUrlsAsync(urls: string[]): Promise<void> {
-  const unique = [...new Set(urls.filter(Boolean))];
-  if (!unique.length) return Promise.resolve();
-
-  return Promise.all(
-    unique.map(
-      (url) =>
-        new Promise<void>((resolve) => {
-          const img = new Image();
-          img.decoding = "async";
-          img.onload = () => resolve();
-          img.onerror = () => resolve();
-          img.src = url;
-        }),
-    ),
-  ).then(() => undefined);
+export function preloadFirstImage(url: string, width = 1440) {
+  if (!url) return;
+  const img = new Image();
+  img.fetchPriority = "high";
+  img.decoding = "async";
+  img.src = optimizeImageUrl(url, width);
 }

@@ -19,12 +19,8 @@ import {
 } from "@/lib/use-site-content";
 
 export const Route = createFileRoute("/")({
-  loader: async ({ context }) => {
-    try {
-      await context.queryClient.ensureQueryData(siteImagesQueryOptions());
-    } catch {
-      /* Homepage still loads with static image fallbacks */
-    }
+  loader: ({ context }) => {
+    void context.queryClient.prefetchQuery(siteImagesQueryOptions());
   },
   head: () => ({
     meta: [
@@ -71,6 +67,8 @@ function Home() {
                   <img
                     src={item.image}
                     alt=""
+                    loading="lazy"
+                    decoding="async"
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[oklch(0.18_0.07_260/0.92)] via-[oklch(0.18_0.07_260/0.35)] to-transparent" />

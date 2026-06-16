@@ -2,7 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchPublicImages, fetchPublicTestimonials } from "@/lib/admin-api";
 import { heroSlides, images } from "@/lib/images";
 import {
-  preloadImageUrls,
+  optimizeImageUrl,
+  preloadFirstImage,
   readCachedImageMap,
   writeCachedImageMap,
 } from "@/lib/site-image-cache";
@@ -14,7 +15,8 @@ function getInitialImageData() {
   const map = readCachedImageMap();
   if (!map) return undefined;
 
-  preloadImageUrls(Object.values(map));
+  const firstHero = map["hero.slide.1"];
+  if (firstHero) preloadFirstImage(firstHero);
   return { items: [], map };
 }
 
@@ -25,7 +27,8 @@ export function siteImagesQueryOptions() {
       try {
         const data = await fetchPublicImages();
         writeCachedImageMap(data.map);
-        preloadImageUrls(Object.values(data.map));
+        const firstHero = data.map["hero.slide.1"];
+        if (firstHero) preloadFirstImage(firstHero);
         return data;
       } catch {
         const cached = readCachedImageMap();
@@ -34,8 +37,8 @@ export function siteImagesQueryOptions() {
       }
     },
     initialData: getInitialImageData(),
-    staleTime: 30_000,
-    refetchOnMount: true as const,
+    staleTime: 5 * 60_000,
+    refetchOnMount: false as const,
     retry: 1,
   };
 }
@@ -56,25 +59,25 @@ export function useSiteImages() {
 }
 
 export function useHeroSlides() {
-  const { data: map, isPending } = useSiteImageMap();
+  const { data: map } = useSiteImageMap();
 
-  const slides = heroSlides.map((slide, index) => ({
-    ...slide,
-    image: map?.[`hero.slide.${index + 1}`] ?? slide.image,
-  }));
+  const slides = heroSlides.map((slide, index) => {
+    const raw = map?.[`hero.slide.${index + 1}`] ?? slide.image;
+    return {
+      ...slide,
+      image: optimizeImageUrl(raw, index === 0 ? 1440 : 1200),
+    };
+  });
 
-  return {
-    slides,
-    /** True only on first visit with no cached image map */
-    isLoading: isPending && !map,
-  };
+  return { slides };
 }
 
 export function usePublicTestimonials() {
   return useQuery({
     queryKey: ["site-testimonials"],
     queryFn: fetchPublicTestimonials,
-    staleTime: 60_000,
+    staleTime: 5 * 60_000,
+    refetchOnMount: false,
     select: (data) =>
       data.items.length
         ? data.items.map((item) => ({ name: item.name, role: item.role, quote: item.quote }))

@@ -9,8 +9,8 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
+import { preloadFirstImage } from "@/lib/site-image-cache";
 import { cn } from "@/lib/utils";
-import { preloadImageUrlsAsync, readCachedImageMap } from "@/lib/site-image-cache";
 import { useHeroSlides } from "@/lib/use-site-content";
 
 function SlideTitle({ title, highlight, line2 }: { title: string; highlight?: string; line2?: string }) {
@@ -45,39 +45,52 @@ function SlideTitle({ title, highlight, line2 }: { title: string; highlight?: st
   );
 }
 
-function HeroSliderPlaceholder() {
+function HeroSlideImage({
+  src,
+  active,
+  priority,
+}: {
+  src: string;
+  active: boolean;
+  priority?: boolean;
+}) {
+  const [loaded, setLoaded] = useState(false);
+
   return (
-    <section className="relative isolate min-h-[70vh] overflow-hidden bg-[oklch(0.16_0.06_260)] sm:min-h-[78vh] lg:min-h-[85vh] xl:min-h-[88vh]">
-      <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-[oklch(0.20_0.07_258)] via-[oklch(0.28_0.09_256)] to-[oklch(0.35_0.10_250)]" />
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-      </div>
-    </section>
+    <>
+      <div
+        className={cn(
+          "absolute inset-0 bg-[oklch(0.20_0.07_258)] transition-opacity duration-500",
+          loaded ? "opacity-0" : "opacity-100",
+        )}
+        aria-hidden
+      />
+      <img
+        src={src}
+        alt=""
+        decoding="async"
+        fetchPriority={priority ? "high" : "auto"}
+        loading={priority ? "eager" : "lazy"}
+        onLoad={() => setLoaded(true)}
+        className={cn(
+          "h-full w-full object-cover brightness-[1.06] contrast-[1.04] saturate-[1.08] transition-all duration-700 ease-out",
+          active ? "scale-105" : "scale-100",
+          loaded ? "opacity-100" : "opacity-0",
+        )}
+      />
+    </>
   );
 }
 
 export function HeroSlider() {
-  const { slides: heroSlides, isLoading: mapLoading } = useHeroSlides();
-  const [imagesReady, setImagesReady] = useState(() => !!readCachedImageMap());
+  const { slides: heroSlides } = useHeroSlides();
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
 
   useEffect(() => {
-    if (mapLoading) {
-      setImagesReady(false);
-      return;
-    }
-
-    let cancelled = false;
-    preloadImageUrlsAsync(heroSlides.map((slide) => slide.image)).then(() => {
-      if (!cancelled) setImagesReady(true);
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [heroSlides, mapLoading]);
+    if (heroSlides[0]?.image) preloadFirstImage(heroSlides[0].image);
+  }, [heroSlides]);
 
   useEffect(() => {
     if (!api) return;
@@ -101,11 +114,7 @@ export function HeroSlider() {
     return () => window.clearInterval(timer);
   }, [api, paused]);
 
-  if (mapLoading || !imagesReady) {
-    return <HeroSliderPlaceholder />;
-  }
-
-  const slide = heroSlides[current];
+  const slide = heroSlides[current] ?? heroSlides[0];
 
   return (
     <section
@@ -118,15 +127,11 @@ export function HeroSlider() {
           {heroSlides.map((item, index) => (
             <CarouselItem key={item.title} className="relative min-h-[70vh] basis-full pl-0 sm:min-h-[78vh] lg:min-h-[85vh] xl:min-h-[88vh]">
               <div className="absolute inset-0 -z-10">
-                <img
+                <HeroSlideImage
                   src={item.image}
-                  alt=""
-                  className={cn(
-                    "h-full w-full object-cover brightness-[1.06] contrast-[1.04] saturate-[1.08] transition-transform duration-[8000ms] ease-out",
-                    current === index ? "scale-105" : "scale-100",
-                  )}
+                  active={current === index}
+                  priority={index === 0}
                 />
-                {/* Light left gradient — keeps text readable without hiding the photo */}
                 <div className="absolute inset-0 bg-gradient-to-r from-[oklch(0.14_0.07_260/0.62)] via-[oklch(0.14_0.07_260/0.22)] to-transparent" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[oklch(0.14_0.07_260/0.35)] via-transparent to-transparent" />
               </div>
@@ -138,47 +143,29 @@ export function HeroSlider() {
           <AnimatePresence mode="wait">
             <motion.div
               key={current}
-              initial={{ opacity: 0, y: 32 }}
+              initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
               className="pointer-events-auto max-w-4xl text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.45)]"
             >
               {slide.eyebrow && (
-                <motion.p
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.1 }}
-                  className="text-[10px] font-semibold uppercase tracking-[0.2em] text-secondary sm:text-xs"
-                >
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-secondary sm:text-xs">
                   {slide.eyebrow}
-                </motion.p>
+                </p>
               )}
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.15, duration: 0.6 }}
+              <h1
                 className={cn(
                   "max-w-4xl text-3xl font-bold leading-[1.1] tracking-tight xs:text-[2rem] sm:text-4xl md:text-5xl lg:text-6xl xl:text-[4.25rem]",
                   slide.eyebrow ? "mt-3 sm:mt-4" : "mt-0",
                 )}
               >
                 <SlideTitle title={slide.title} highlight={slide.highlight} line2={slide.titleLine2} />
-              </motion.h1>
-              <motion.p
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.25 }}
-                className="mt-4 max-w-xl text-sm leading-relaxed text-white/95 sm:mt-6 sm:text-base md:text-lg"
-              >
+              </h1>
+              <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/95 sm:mt-6 sm:text-base md:text-lg">
                 {slide.description}
-              </motion.p>
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.35 }}
-                className="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap"
-              >
+              </p>
+              <div className="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap">
                 <Button
                   asChild
                   size="lg"
@@ -201,7 +188,7 @@ export function HeroSlider() {
                     {slide.secondaryLabel}
                   </Link>
                 </Button>
-              </motion.div>
+              </div>
             </motion.div>
           </AnimatePresence>
         </div>
