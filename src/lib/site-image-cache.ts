@@ -1,5 +1,6 @@
 const CACHE_KEY = "pb_site_image_map";
-const CACHE_VERSION = 1;
+const CACHE_VERSION = 2;
+const CACHE_MAX_AGE_MS = 30 * 60_000;
 
 type CachedPayload = {
   version: number;
@@ -24,10 +25,19 @@ export function readCachedImageMap(): Record<string, string> | undefined {
 
     const parsed = JSON.parse(raw) as CachedPayload;
     if (parsed.version !== CACHE_VERSION || !parsed.map) return undefined;
+    if (Date.now() - parsed.updatedAt > CACHE_MAX_AGE_MS) return undefined;
 
     return parsed.map;
   } catch {
     return undefined;
+  }
+}
+
+export function clearCachedImageMap() {
+  try {
+    localStorage.removeItem(CACHE_KEY);
+  } catch {
+    /* ignore */
   }
 }
 

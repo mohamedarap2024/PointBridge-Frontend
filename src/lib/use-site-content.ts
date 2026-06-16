@@ -9,17 +9,6 @@ import {
 } from "@/lib/site-image-cache";
 import { blogPosts, publications, testimonials as staticTestimonials } from "@/lib/site-data";
 
-function getInitialImageData() {
-  if (typeof window === "undefined") return undefined;
-
-  const map = readCachedImageMap();
-  if (!map) return undefined;
-
-  const firstHero = map["hero.slide.1"];
-  if (firstHero) preloadFirstImage(firstHero);
-  return { items: [], map };
-}
-
 export function siteImagesQueryOptions() {
   return {
     queryKey: ["site-images"] as const,
@@ -36,9 +25,8 @@ export function siteImagesQueryOptions() {
         return { items: [], map: {} };
       }
     },
-    initialData: getInitialImageData(),
-    staleTime: 5 * 60_000,
-    refetchOnMount: false as const,
+    staleTime: 60_000,
+    refetchOnMount: "always" as const,
     retry: 1,
   };
 }

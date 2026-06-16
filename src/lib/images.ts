@@ -61,7 +61,7 @@ export type HeroSlide = {
 
 export const heroSlides: HeroSlide[] = [
   {
-    image: heroImg,
+    image: "https://i.ibb.co/VWXQhGyB/hero-slide-1.jpg",
     title: "Expertise Beyond Boundaries",
     highlight: "Beyond Boundaries",
     titleLine2: "for Your Organization",
@@ -73,7 +73,7 @@ export const heroSlides: HeroSlide[] = [
     secondaryLabel: "Watch Video",
   },
   {
-    image: aboutImg,
+    image: "https://i.ibb.co/TqrGBqnH/hero-slide-4.jpg",
     eyebrow: "Governance & Reform",
     title: "Building Capacity for",
     highlight: "Lasting Reform",
@@ -85,7 +85,7 @@ export const heroSlides: HeroSlide[] = [
     secondaryLabel: "View Projects",
   },
   {
-    image: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=1600&q=80",
+    image: "https://i.ibb.co/C5YT56Xr/hero-slide-5.jpg",
     eyebrow: "Training & Development",
     title: "Empowering Leaders Through",
     highlight: "Expert Training",
@@ -97,7 +97,7 @@ export const heroSlides: HeroSlide[] = [
     secondaryLabel: "Contact Us",
   },
   {
-    image: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=1600&q=80",
+    image: "https://i.ibb.co/4wBBvpFV/hero-slide-2.jpg",
     eyebrow: "Research & Analytics",
     title: "Rigorous Insights in",
     highlight: "Complex Settings",

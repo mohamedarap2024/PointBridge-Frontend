@@ -51,7 +51,6 @@ export function ContentCard({
               loading="lazy"
               decoding="async"
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-              loading="lazy"
             />
           </div>
           <div className="flex flex-1 flex-col p-4 sm:p-5">
