@@ -16,7 +16,7 @@ export function Footer() {
               <Logo variant="footer" />
             </Link>
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-white/75">
-              Empowering organizations through innovative solutions and sustainable transformation.
+              Independent advisory & evaluation firm — rigorous insights in complex and fragile settings since 2019.
             </p>
             <SocialLinks variant="footer" className="mt-6" />
           </div>

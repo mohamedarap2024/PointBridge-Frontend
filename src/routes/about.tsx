@@ -4,22 +4,16 @@ import { Reveal } from "@/components/site/Reveal";
 import { PageHero } from "@/components/site/PageHero";
 import { Card, CardContent } from "@/components/ui/card";
 import { teamMembers, timeline } from "@/lib/site-data";
+import { companyAboutParagraphs, companySummary, companyTagline } from "@/lib/company-profile";
 import { images } from "@/lib/images";
-
-const aboutUsParagraphs = [
-  "Founded in 2019, PointBridge Consulting is an independent advisory and evaluation firm headquartered in East Africa. We partner with UN agencies, international NGOs, bilateral donors, and foundations to deliver rigorous, evidence-based solutions in some of the world's most complex and fragile environments.",
-  "Our expertise spans strategic policy, peace-building, audit and risk management, human capital development, research and analytics, monitoring and evaluation, and business development services. We also provide security and related services, translation and interpretation in multiple languages, and tailored training and capacity development programmes.",
-  "Over the years, we have delivered more than 80 HR systems (including recruitment services), trained 5,000+ professionals, and supported 40+ institutions across governance, humanitarian response, health, education, and economic development. Our research and analytics portfolio now includes research, Proposal and report writing, impact assessments, and advanced data-driven insights.",
-  "What sets us apart is our commitment to context-sensitivity, local ownership, and sustainable capacity development. Every engagement is tailored to the unique realities of the communities we serve, enabling us to build long-term relationships and deliver lasting impact.",
-] as const;
 
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
       { title: "About — PointBridge Consulting" },
-      { name: "description", content: aboutUsParagraphs[0] },
+      { name: "description", content: companySummary },
       { property: "og:title", content: "About — PointBridge Consulting" },
-      { property: "og:description", content: "A bridge between evidence and action — built since 2019." },
+      { property: "og:description", content: companyTagline },
       { property: "og:url", content: "/about" },
     ],
     links: [{ rel: "canonical", href: "/about" }],
@@ -39,9 +33,9 @@ function About() {
     <>
       <PageHero
         image={images.about}
-        eyebrow="About PointBridge"
-        title="Building bridges between evidence, policy and people"
-        description="We are an independent consulting firm working with governments, multilaterals, donors and NGOs in some of the world's most complex environments."
+        eyebrow="About PointBridge Consulting"
+        title="Independent advisory & evaluation since 2019"
+        description={companySummary}
       />
 
       <section className="section-padding border-b border-border bg-white">
@@ -49,8 +43,8 @@ function About() {
           <Reveal>
             <h2 className="text-3xl font-bold tracking-tight md:text-4xl">About Us</h2>
             <div className="mt-6 space-y-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
-              {aboutUsParagraphs.map((paragraph) => (
-                <p key={paragraph.slice(0, 40)}>{paragraph}</p>
+              {companyAboutParagraphs.map((paragraph) => (
+                <p key={paragraph.slice(0, 48)}>{paragraph}</p>
               ))}
             </div>
           </Reveal>
@@ -60,9 +54,9 @@ function About() {
       <section className="section-padding">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid md:grid-cols-3 gap-6">
           {[
-            { title: "Our Mission", text: "To deliver rigorous, actionable insights that strengthen institutions and improve lives in complex and fragile settings.", img: images.services["strategic-policy-governance"] },
-            { title: "Our Vision", text: "A world where every leader has the evidence they need to make decisions that hold up under scrutiny.", img: images.services["research-analytics"] },
-            { title: "Our Approach", text: "Methodology-first, ethics-grounded, partnership-driven — combining international standards with deep local presence.", img: images.services["peace-building"] },
+            { title: "Our Mission", text: "To deliver rigorous, actionable evaluations and advisory services that strengthen institutions and improve lives in complex and fragile settings.", img: images.services["strategic-policy-governance"] },
+            { title: "Our Vision", text: "A region where every leader and programme has the evidence needed to make decisions that hold up under scrutiny.", img: images.services["research-analytics"] },
+            { title: "Our Approach", text: "Context-sensitive, partnership-driven, and grounded in international standards with deep local presence across East Africa.", img: images.services["peace-building"] },
           ].map((b, i) => (
             <Reveal key={b.title} delay={i * 0.08}>
               <Card className="h-full overflow-hidden">

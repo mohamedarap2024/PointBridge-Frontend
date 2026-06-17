@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trainings } from "@/lib/site-data";
+import { trainingIntro } from "@/lib/company-profile";
 import { images } from "@/lib/images";
 
 export const Route = createFileRoute("/training")({
@@ -40,9 +41,9 @@ function Training() {
     <>
       <PageHero
         image={images.quickLinks.training}
-        eyebrow="Professional Training"
-        title="Programs that move careers and institutions forward"
-        description="Practitioner-led curricula. Cohort-based. Designed for public-sector, NGO and private-sector leaders."
+        eyebrow="Training & Capacity Development"
+        title="Structured programmes that build lasting skills"
+        description={trainingIntro}
       />
 
       <section className="section-padding">

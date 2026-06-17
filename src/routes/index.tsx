@@ -7,7 +7,8 @@ import { HeroSlider } from "@/components/site/HeroSlider";
 import { ServiceCard } from "@/components/site/ServiceCard";
 import { ContentCard } from "@/components/site/ContentCard";
 import { SectionHeader } from "@/components/site/SectionHeader";
-import { services, partners } from "@/lib/site-data";
+import { featuredServices, partners, stats } from "@/lib/site-data";
+import { companyTagline } from "@/lib/company-profile";
 import { images } from "@/lib/images";
 import {
   resolveBlogPosts,
@@ -86,18 +87,34 @@ function Home() {
         </div>
       </section>
 
+      {/* Impact stats — Company Profile 2025 */}
+      <section className="border-y border-border bg-[oklch(0.16_0.06_260)] text-white">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-6 px-4 py-10 sm:px-6 md:grid-cols-4 lg:px-8">
+          {stats.map((s, i) => (
+            <Reveal key={s.label} delay={i * 0.06}>
+              <div className="text-center">
+                <p className="text-3xl font-bold text-secondary sm:text-4xl">{s.value}</p>
+                <p className="mt-1 text-xs font-medium uppercase tracking-wider text-white/75 sm:text-sm">
+                  {s.label}
+                </p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
       {/* What We Do */}
       <section className="section-padding mt-8 bg-[oklch(0.98_0.005_255)]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Reveal>
             <SectionHeader
               eyebrow="What We Do"
-              title="Comprehensive consulting solutions"
-              description="Designed to transform your organization and drive sustainable growth across all sectors"
+              title="Our Core Service Areas"
+              description={companyTagline}
             />
           </Reveal>
           <div className="mt-8 grid gap-4 sm:mt-12 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {services.map((s, i) => (
+            {featuredServices.map((s, i) => (
               <Reveal key={s.slug} delay={i * 0.04}>
                 <ServiceCard
                   title={s.title}

@@ -19,6 +19,9 @@ export const images = {
     "monitoring-evaluation": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80",
     "business-development": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&q=80",
     "ict-solutions": "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80",
+    "education-consultancy": "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&q=80",
+    "environmental-climate": "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=800&q=80",
+    "hospitality-management": "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80",
   },
   blog: [
     "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
