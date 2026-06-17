@@ -1,6 +1,36 @@
 /** Official company profile content — PointBridge Consulting (2025). */
 
+export const companyName = "PointBridge Consulting";
+
+export const companyEstablished = "2019";
+
+export const companyWebsite = "https://pointbridgeconsulting.com";
+
+export const companyWebsiteDisplay = "www.pointbridgeconsulting.com";
+
+export const companySlogan =
+  "Delivering rigorous, actionable insights in complex and fragile settings.";
+
 export const companyTagline = "Independent Advisory & Evaluation Firm";
+
+export const companyEmails = {
+  general: "pointbridgeconsulting@gmail.com",
+  direct: "keynan@pointbridgeconsulting.com",
+} as const;
+
+export const companyPhone = "+252-613-685-943";
+
+export const companyRegion = "Horn of Africa Region";
+
+export const companyHours = "Sat–Thu: 8.00 to 17.00";
+
+export const contactDetails = [
+  { label: "Company", value: companyName },
+  { label: "Est.", value: companyEstablished },
+  { label: "Website", value: companyWebsiteDisplay, href: companyWebsite },
+  { label: "Email", value: companyEmails.general, href: `mailto:${companyEmails.general}` },
+  { label: "Email", value: companyEmails.direct, href: `mailto:${companyEmails.direct}` },
+] as const;
 
 export const companySummary =
   "PointBridge Consulting is an independent evaluation and advisory firm founded in 2019. We work with UN agencies, international NGOs, bilateral donors, and foundations to deliver rigorous, actionable evaluations in complex and fragile settings.";

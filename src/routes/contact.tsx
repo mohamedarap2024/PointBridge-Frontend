@@ -14,12 +14,22 @@ import { z } from "zod";
 
 import { images } from "@/lib/images";
 import { submitContact } from "@/lib/api";
+import {
+  companyEmails,
+  companyEstablished,
+  companyPhone,
+  companyRegion,
+  companySlogan,
+  companyWebsite,
+  companyWebsiteDisplay,
+  contactDetails,
+} from "@/lib/company-profile";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
       { title: "Contact — PointBridge Consulting" },
-      { name: "description", content: "Reach PointBridge Consulting. We respond within two business days." },
+      { name: "description", content: `${companySlogan} Contact PointBridge Consulting — established ${companyEstablished}.` },
       { property: "og:title", content: "Contact — PointBridge Consulting" },
       { property: "og:description", content: "Get in touch with our team." },
       { property: "og:url", content: "/contact" },
@@ -72,9 +82,9 @@ function Contact() {
     <>
       <PageHero
         image={images.cta}
-        eyebrow="Contact"
-        title="Let's work together"
-        description="Tell us about your program, policy challenge or institution. We respond within two business days."
+        eyebrow="Contact Information"
+        title="Get in touch with PointBridge Consulting"
+        description={companySlogan}
       />
 
       <section className="section-padding mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid lg:grid-cols-3 gap-8">
@@ -94,12 +104,34 @@ function Contact() {
         </div>
 
         <div className="space-y-4">
+          <Card className="border-primary/20 bg-primary/5">
+            <CardContent className="p-5 sm:p-6">
+              <h2 className="text-lg font-bold text-foreground">Contact Information</h2>
+              <dl className="mt-4 divide-y divide-border">
+                {contactDetails.map((row) => (
+                  <div key={`${row.label}-${row.value}`} className="flex gap-4 py-3 text-sm first:pt-0 last:pb-0">
+                    <dt className="w-24 shrink-0 font-semibold text-foreground">{row.label}</dt>
+                    <dd className="text-muted-foreground">
+                      {"href" in row && row.href ? (
+                        <a href={row.href} className="font-medium text-primary hover:underline break-all">
+                          {row.value}
+                        </a>
+                      ) : (
+                        <span className="font-medium text-foreground">{row.value}</span>
+                      )}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+              <p className="mt-5 border-t border-border pt-4 text-center text-sm italic text-primary/90">
+                {companySlogan}
+              </p>
+            </CardContent>
+          </Card>
+
           {[
-            { icon: Mail, label: "Email", value: "pointbridgeconsulting@gmail.com", href: "mailto:pointbridgeconsulting@gmail.com" },
-            { icon: Mail, label: "Direct", value: "keynan@pointbridgeconsulting.com", href: "mailto:keynan@pointbridgeconsulting.com" },
-            { icon: Globe, label: "Website", value: "www.pointbridgeconsulting.com" },
-            { icon: MapPin, label: "Region", value: "Horn of Africa" },
-            { icon: Phone, label: "WhatsApp", value: "Tap the green button to chat" },
+            { icon: Phone, label: "Phone / WhatsApp", value: companyPhone, href: `tel:${companyPhone.replace(/-/g, "")}` },
+            { icon: MapPin, label: "Region", value: companyRegion },
           ].map((c) => (
             <Card key={c.label}>
               <CardContent className="p-5 flex items-start gap-3">

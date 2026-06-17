@@ -2,6 +2,16 @@ import { Link } from "@tanstack/react-router";
 import { ArrowUp, Globe, Mail, MapPin, Phone } from "lucide-react";
 import { Logo } from "./Logo";
 import { SocialLinks } from "./SocialLinks";
+import {
+  companyEmails,
+  companyEstablished,
+  companyName,
+  companyPhone,
+  companyRegion,
+  companySlogan,
+  companyWebsite,
+  companyWebsiteDisplay,
+} from "@/lib/company-profile";
 
 const linkClass = "text-white/75 transition-colors hover:text-secondary";
 const headingClass = "text-sm font-bold uppercase tracking-wider text-secondary";
@@ -16,8 +26,9 @@ export function Footer() {
               <Logo variant="footer" />
             </Link>
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-white/75">
-              Independent advisory & evaluation firm — rigorous insights in complex and fragile settings since 2019.
+              {companySlogan}
             </p>
+            <p className="mt-2 text-xs text-white/55">Est. {companyEstablished} · {companyName}</p>
             <SocialLinks variant="footer" className="mt-6" />
           </div>
 
@@ -46,27 +57,33 @@ export function Footer() {
             <ul className="mt-4 space-y-3 text-sm text-white/75">
               <li className="flex items-start gap-2.5">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-secondary" />
-                Horn of Africa Region
+                {companyRegion}
               </li>
               <li className="flex items-start gap-2.5">
                 <Phone className="mt-0.5 h-4 w-4 shrink-0 text-secondary" />
-                <a href="tel:+252613685943" className="hover:text-secondary transition-colors">+252-613-685-943</a>
+                <a href="tel:+252613685943" className="hover:text-secondary transition-colors">{companyPhone}</a>
               </li>
               <li className="flex items-start gap-2.5">
                 <Mail className="mt-0.5 h-4 w-4 shrink-0 text-secondary" />
-                <a href="mailto:pointbridgeconsulting@gmail.com" className="hover:text-secondary transition-colors break-all">
-                  pointbridgeconsulting@gmail.com
+                <a href={`mailto:${companyEmails.general}`} className="hover:text-secondary transition-colors break-all">
+                  {companyEmails.general}
+                </a>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <Mail className="mt-0.5 h-4 w-4 shrink-0 text-secondary" />
+                <a href={`mailto:${companyEmails.direct}`} className="hover:text-secondary transition-colors break-all">
+                  {companyEmails.direct}
                 </a>
               </li>
               <li className="flex items-start gap-2.5">
                 <Globe className="mt-0.5 h-4 w-4 shrink-0 text-secondary" />
                 <a
-                  href="https://pointbridgeconsulting.com"
+                  href={companyWebsite}
                   className="hover:text-secondary transition-colors"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  pointbridgeconsulting.com
+                  {companyWebsiteDisplay}
                 </a>
               </li>
             </ul>
