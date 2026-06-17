@@ -1,76 +1,66 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
-import { adminApi, type Testimonial } from "@/lib/admin-api";
-import { Badge } from "@/components/ui/badge";
+import { adminApi, type TeamMember } from "@/lib/admin-api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 
-export const Route = createFileRoute("/admin/testimonials")({
-  head: () => ({ meta: [{ title: "Feedback — Admin" }] }),
-  component: AdminTestimonialsPage,
+export const Route = createFileRoute("/admin/team")({
+  head: () => ({ meta: [{ title: "Leadership Team — Admin" }] }),
+  component: AdminTeamPage,
 });
 
-function TestimonialCard({ item }: { item: Testimonial }) {
+function TeamMemberCard({ item }: { item: TeamMember }) {
   const queryClient = useQueryClient();
   const [name, setName] = useState(item.name);
   const [role, setRole] = useState(item.role);
-  const [quote, setQuote] = useState(item.quote);
-  const [image, setImage] = useState(item.image ?? "");
-  const [approved, setApproved] = useState(item.approved);
+  const [bio, setBio] = useState(item.bio);
+  const [image, setImage] = useState(item.image);
+  const [sortOrder, setSortOrder] = useState(String(item.sortOrder));
 
   const saveMutation = useMutation({
     mutationFn: () =>
-      adminApi.updateTestimonial(item.id, {
+      adminApi.updateTeamMember(item.id, {
         name,
         role,
-        quote,
-        image: image.trim() || null,
-        approved,
+        bio,
+        image,
+        sortOrder: Number(sortOrder) || 0,
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-testimonials"] });
-      queryClient.invalidateQueries({ queryKey: ["site-testimonials"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-team"] });
+      queryClient.invalidateQueries({ queryKey: ["site-team"] });
       queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
-      toast.success("Feedback updated");
+      toast.success("Team member updated");
     },
   });
 
   const deleteMutation = useMutation({
-    mutationFn: () => adminApi.deleteTestimonial(item.id),
+    mutationFn: () => adminApi.deleteTeamMember(item.id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-testimonials"] });
-      queryClient.invalidateQueries({ queryKey: ["site-testimonials"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-team"] });
+      queryClient.invalidateQueries({ queryKey: ["site-team"] });
       queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
-      toast.success("Feedback deleted");
+      toast.success("Team member removed");
     },
   });
 
   return (
     <Card className="overflow-hidden border-border/60">
-      <div className="grid md:grid-cols-[140px_1fr]">
-        <div className="flex items-center justify-center bg-muted p-6 md:min-h-[200px]">
-          <div className="h-24 w-24 overflow-hidden rounded-full ring-2 ring-secondary/20">
-            {image ? (
-              <img src={image} alt={name} className="h-full w-full object-cover" />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center bg-muted text-xs text-muted-foreground">
-                No photo
-              </div>
-            )}
-          </div>
+      <div className="grid md:grid-cols-[200px_1fr]">
+        <div className="relative aspect-square bg-muted md:aspect-auto md:min-h-[220px]">
+          <img src={image} alt={name} className="h-full w-full object-cover" />
         </div>
         <div>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0">
-            <div className="flex items-center gap-2">
-              <CardTitle className="text-base">{item.name}</CardTitle>
-              <Badge variant={approved ? "default" : "secondary"}>{approved ? "Approved" : "Pending"}</Badge>
+          <CardHeader className="flex flex-row items-start justify-between space-y-0">
+            <div>
+              <CardTitle className="text-base">{name}</CardTitle>
+              <p className="text-xs text-muted-foreground">{role}</p>
             </div>
             <Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteMutation.mutate()}>
               <Trash2 className="h-4 w-4" />
@@ -88,7 +78,7 @@ function TestimonialCard({ item }: { item: Testimonial }) {
               </div>
             </div>
             <div>
-              <Label htmlFor={`image-${item.id}`}>Profile image URL</Label>
+              <Label htmlFor={`image-${item.id}`}>Image URL</Label>
               <Input
                 id={`image-${item.id}`}
                 value={image}
@@ -97,15 +87,18 @@ function TestimonialCard({ item }: { item: Testimonial }) {
               />
             </div>
             <div>
-              <Label htmlFor={`quote-${item.id}`}>Quote</Label>
-              <Textarea id={`quote-${item.id}`} rows={3} value={quote} onChange={(e) => setQuote(e.target.value)} />
+              <Label htmlFor={`bio-${item.id}`}>Description</Label>
+              <Textarea id={`bio-${item.id}`} rows={3} value={bio} onChange={(e) => setBio(e.target.value)} />
             </div>
-            <div className="flex items-center justify-between rounded-xl border border-border px-4 py-3">
-              <div>
-                <p className="text-sm font-medium">Show on website</p>
-                <p className="text-xs text-muted-foreground">Approved feedback appears on the homepage.</p>
-              </div>
-              <Switch checked={approved} onCheckedChange={setApproved} />
+            <div className="max-w-[140px]">
+              <Label htmlFor={`sort-${item.id}`}>Display order</Label>
+              <Input
+                id={`sort-${item.id}`}
+                type="number"
+                min={0}
+                value={sortOrder}
+                onChange={(e) => setSortOrder(e.target.value)}
+              />
             </div>
             <Button onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending}>
               Save changes
@@ -117,38 +110,40 @@ function TestimonialCard({ item }: { item: Testimonial }) {
   );
 }
 
-function AdminTestimonialsPage() {
+function AdminTeamPage() {
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
-  const [quote, setQuote] = useState("");
+  const [bio, setBio] = useState("");
   const [image, setImage] = useState("");
+  const [sortOrder, setSortOrder] = useState("0");
 
   const { data, isLoading } = useQuery({
-    queryKey: ["admin-testimonials"],
-    queryFn: adminApi.testimonials,
+    queryKey: ["admin-team"],
+    queryFn: adminApi.team,
   });
 
   const createMutation = useMutation({
     mutationFn: () =>
-      adminApi.createTestimonial({
+      adminApi.createTeamMember({
         name,
         role,
-        quote,
-        image: image.trim() || null,
-        approved: true,
+        bio,
+        image,
+        sortOrder: Number(sortOrder) || 0,
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-testimonials"] });
-      queryClient.invalidateQueries({ queryKey: ["site-testimonials"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-team"] });
+      queryClient.invalidateQueries({ queryKey: ["site-team"] });
       queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
       setName("");
       setRole("");
-      setQuote("");
+      setBio("");
       setImage("");
+      setSortOrder("0");
       setShowForm(false);
-      toast.success("Feedback added");
+      toast.success("Team member added");
     },
   });
 
@@ -156,51 +151,61 @@ function AdminTestimonialsPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-bold">Customer Feedback</h2>
+          <h2 className="text-2xl font-bold">Leadership Team</h2>
           <p className="mt-1 text-muted-foreground">
-            Manage client testimonials — names, titles, photos and quotes on the homepage.
+            Edit names, titles, photos and descriptions shown on the About page.
           </p>
         </div>
         <Button onClick={() => setShowForm((v) => !v)}>
           <Plus className="mr-2 h-4 w-4" />
-          Add Feedback
+          Add member
         </Button>
       </div>
 
       {showForm && (
         <Card>
           <CardHeader>
-            <CardTitle>New Feedback</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              New team member
+            </CardTitle>
           </CardHeader>
           <CardContent className="grid gap-3 sm:grid-cols-2">
             <Input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
-            <Input placeholder="Title / Organization" value={role} onChange={(e) => setRole(e.target.value)} />
+            <Input placeholder="Title / Role" value={role} onChange={(e) => setRole(e.target.value)} />
             <Input
               className="sm:col-span-2"
-              placeholder="Profile image URL (https://... or /path.jpg)"
+              placeholder="Image URL (https://... or /path.jpg)"
               value={image}
               onChange={(e) => setImage(e.target.value)}
             />
             <Textarea
               className="sm:col-span-2"
-              placeholder="Quote"
+              placeholder="Description"
               rows={3}
-              value={quote}
-              onChange={(e) => setQuote(e.target.value)}
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+            />
+            <Input
+              type="number"
+              min={0}
+              placeholder="Display order"
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
             />
             <Button className="sm:col-start-2" onClick={() => createMutation.mutate()} disabled={createMutation.isPending}>
-              Save feedback
+              Save member
             </Button>
           </CardContent>
         </Card>
       )}
 
       {isLoading ? (
-        <div className="rounded-2xl border border-dashed p-10 text-center text-muted-foreground">Loading feedback…</div>
+        <div className="rounded-2xl border border-dashed p-10 text-center text-muted-foreground">Loading team…</div>
       ) : (
         <div className="grid gap-4">
           {data?.items.map((item) => (
-            <TestimonialCard key={item.id} item={item} />
+            <TeamMemberCard key={item.id} item={item} />
           ))}
         </div>
       )}

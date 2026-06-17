@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchPublicImages, fetchPublicTestimonials } from "@/lib/admin-api";
+import { fetchPublicClients, fetchPublicImages, fetchPublicTeamMembers, fetchPublicTestimonials } from "@/lib/admin-api";
 import { heroSlides, images } from "@/lib/images";
 import {
   optimizeImageUrl,
@@ -7,7 +7,8 @@ import {
   readCachedImageMap,
   writeCachedImageMap,
 } from "@/lib/site-image-cache";
-import { blogPosts, publications, testimonials as staticTestimonials } from "@/lib/site-data";
+import { images } from "@/lib/images";
+import { blogPosts, partners as staticPartners, publications, teamMembers as staticTeamMembers, testimonials as staticTestimonials } from "@/lib/site-data";
 
 export function siteImagesQueryOptions() {
   return {
@@ -68,8 +69,53 @@ export function usePublicTestimonials() {
     refetchOnMount: false,
     select: (data) =>
       data.items.length
-        ? data.items.map((item) => ({ name: item.name, role: item.role, quote: item.quote }))
-        : staticTestimonials,
+        ? data.items.map((item) => ({
+            id: item.id,
+            name: item.name,
+            role: item.role,
+            quote: item.quote,
+            image: item.image,
+          }))
+        : staticTestimonials.map((item, index) => ({
+            ...item,
+            image: item.image ?? images.team[index] ?? images.team[0],
+          })),
+  });
+}
+
+export function usePublicTeamMembers() {
+  return useQuery({
+    queryKey: ["site-team"],
+    queryFn: fetchPublicTeamMembers,
+    staleTime: 5 * 60_000,
+    refetchOnMount: false,
+    select: (data) =>
+      data.items.length
+        ? data.items.map((item) => ({
+            id: item.id,
+            name: item.name,
+            role: item.role,
+            bio: item.bio,
+            image: item.image,
+          }))
+        : staticTeamMembers,
+  });
+}
+
+export function usePublicClients() {
+  return useQuery({
+    queryKey: ["site-clients"],
+    queryFn: fetchPublicClients,
+    staleTime: 5 * 60_000,
+    refetchOnMount: false,
+    select: (data) =>
+      data.items.length
+        ? data.items.map((item) => ({
+            id: item.id,
+            name: item.name,
+            logo: item.logo,
+          }))
+        : staticPartners.map((name) => ({ name, logo: null as string | null })),
   });
 }
 

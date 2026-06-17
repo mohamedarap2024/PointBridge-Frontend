@@ -23,9 +23,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminTestimonialsRouteImport } from './routes/admin/testimonials'
+import { Route as AdminTeamRouteImport } from './routes/admin/team'
 import { Route as AdminMessagesRouteImport } from './routes/admin/messages'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AdminImagesRouteImport } from './routes/admin/images'
+import { Route as AdminClientsRouteImport } from './routes/admin/clients'
 
 const TrainingRoute = TrainingRouteImport.update({
   id: '/training',
@@ -97,6 +99,11 @@ const AdminTestimonialsRoute = AdminTestimonialsRouteImport.update({
   path: '/testimonials',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminTeamRoute = AdminTeamRouteImport.update({
+  id: '/team',
+  path: '/team',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminMessagesRoute = AdminMessagesRouteImport.update({
   id: '/messages',
   path: '/messages',
@@ -112,6 +119,11 @@ const AdminImagesRoute = AdminImagesRouteImport.update({
   path: '/images',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminClientsRoute = AdminClientsRouteImport.update({
+  id: '/clients',
+  path: '/clients',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -125,9 +137,11 @@ export interface FileRoutesByFullPath {
   '/services': typeof ServicesRoute
   '/signup': typeof SignupRoute
   '/training': typeof TrainingRoute
+  '/admin/clients': typeof AdminClientsRoute
   '/admin/images': typeof AdminImagesRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/messages': typeof AdminMessagesRoute
+  '/admin/team': typeof AdminTeamRoute
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/': typeof AdminIndexRoute
@@ -143,9 +157,11 @@ export interface FileRoutesByTo {
   '/services': typeof ServicesRoute
   '/signup': typeof SignupRoute
   '/training': typeof TrainingRoute
+  '/admin/clients': typeof AdminClientsRoute
   '/admin/images': typeof AdminImagesRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/messages': typeof AdminMessagesRoute
+  '/admin/team': typeof AdminTeamRoute
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin': typeof AdminIndexRoute
@@ -163,9 +179,11 @@ export interface FileRoutesById {
   '/services': typeof ServicesRoute
   '/signup': typeof SignupRoute
   '/training': typeof TrainingRoute
+  '/admin/clients': typeof AdminClientsRoute
   '/admin/images': typeof AdminImagesRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/messages': typeof AdminMessagesRoute
+  '/admin/team': typeof AdminTeamRoute
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/': typeof AdminIndexRoute
@@ -184,9 +202,11 @@ export interface FileRouteTypes {
     | '/services'
     | '/signup'
     | '/training'
+    | '/admin/clients'
     | '/admin/images'
     | '/admin/login'
     | '/admin/messages'
+    | '/admin/team'
     | '/admin/testimonials'
     | '/admin/users'
     | '/admin/'
@@ -202,9 +222,11 @@ export interface FileRouteTypes {
     | '/services'
     | '/signup'
     | '/training'
+    | '/admin/clients'
     | '/admin/images'
     | '/admin/login'
     | '/admin/messages'
+    | '/admin/team'
     | '/admin/testimonials'
     | '/admin/users'
     | '/admin'
@@ -221,9 +243,11 @@ export interface FileRouteTypes {
     | '/services'
     | '/signup'
     | '/training'
+    | '/admin/clients'
     | '/admin/images'
     | '/admin/login'
     | '/admin/messages'
+    | '/admin/team'
     | '/admin/testimonials'
     | '/admin/users'
     | '/admin/'
@@ -343,6 +367,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminTestimonialsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/team': {
+      id: '/admin/team'
+      path: '/team'
+      fullPath: '/admin/team'
+      preLoaderRoute: typeof AdminTeamRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/messages': {
       id: '/admin/messages'
       path: '/messages'
@@ -364,22 +395,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminImagesRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/clients': {
+      id: '/admin/clients'
+      path: '/clients'
+      fullPath: '/admin/clients'
+      preLoaderRoute: typeof AdminClientsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
   }
 }
 
 interface AdminRouteRouteChildren {
+  AdminClientsRoute: typeof AdminClientsRoute
   AdminImagesRoute: typeof AdminImagesRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminMessagesRoute: typeof AdminMessagesRoute
+  AdminTeamRoute: typeof AdminTeamRoute
   AdminTestimonialsRoute: typeof AdminTestimonialsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminClientsRoute: AdminClientsRoute,
   AdminImagesRoute: AdminImagesRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminMessagesRoute: AdminMessagesRoute,
+  AdminTeamRoute: AdminTeamRoute,
   AdminTestimonialsRoute: AdminTestimonialsRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,

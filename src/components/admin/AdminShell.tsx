@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import {
   Bell,
   HelpCircle,
+  Building2,
   ImageIcon,
   LayoutDashboard,
   LayoutGrid,
@@ -14,6 +15,7 @@ import {
   PanelLeftClose,
   Search,
   Settings,
+  UserCircle2,
   Users,
   X,
 } from "lucide-react";
@@ -38,6 +40,8 @@ const navItems = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/messages", label: "Messages", icon: Mail },
   { to: "/admin/testimonials", label: "Feedback", icon: MessageSquareQuote },
+  { to: "/admin/team", label: "Leadership", icon: UserCircle2 },
+  { to: "/admin/clients", label: "Client Logos", icon: Building2 },
   { to: "/admin/images", label: "Images", icon: ImageIcon },
   { to: "/admin/users", label: "Users", icon: Users },
 ] as const;

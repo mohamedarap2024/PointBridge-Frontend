@@ -3,9 +3,10 @@ import { Compass, Target, Heart, Sparkles } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
 import { PageHero } from "@/components/site/PageHero";
 import { Card, CardContent } from "@/components/ui/card";
-import { teamMembers, timeline } from "@/lib/site-data";
+import { timeline } from "@/lib/site-data";
 import { companyAboutParagraphs, companySummary, companyTagline } from "@/lib/company-profile";
 import { images } from "@/lib/images";
+import { usePublicTeamMembers } from "@/lib/use-site-content";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -29,6 +30,8 @@ const values = [
 ];
 
 function About() {
+  const { data: teamMembers = [] } = usePublicTeamMembers();
+
   return (
     <>
       <PageHero
@@ -102,7 +105,7 @@ function About() {
           </Reveal>
           <div id="leadership" className="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-6 scroll-mt-28">
             {teamMembers.map((m, i) => (
-              <Reveal key={m.name} delay={i * 0.06}>
+              <Reveal key={m.id ?? m.name} delay={i * 0.06}>
                 <Card className="h-full overflow-hidden group hover:shadow-elegant transition-shadow">
                   <div className="aspect-square overflow-hidden">
                     <img

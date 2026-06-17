@@ -7,7 +7,7 @@ import { HeroSlider } from "@/components/site/HeroSlider";
 import { ServiceCard } from "@/components/site/ServiceCard";
 import { ContentCard } from "@/components/site/ContentCard";
 import { SectionHeader } from "@/components/site/SectionHeader";
-import { featuredServices, partners, stats } from "@/lib/site-data";
+import { featuredServices, stats } from "@/lib/site-data";
 import { companyTagline } from "@/lib/company-profile";
 import { images } from "@/lib/images";
 import {
@@ -15,6 +15,7 @@ import {
   resolvePublications,
   resolveQuickLinkImage,
   siteImagesQueryOptions,
+  usePublicClients,
   usePublicTestimonials,
   useSiteImageMap,
 } from "@/lib/use-site-content";
@@ -46,6 +47,7 @@ const quickLinkMeta = [
 function Home() {
   const { data: imageMap } = useSiteImageMap();
   const { data: testimonials = [] } = usePublicTestimonials();
+  const { data: clients = [] } = usePublicClients();
   const blogPosts = resolveBlogPosts(imageMap);
   const publicationItems = resolvePublications(imageMap);
   const quickLinks = quickLinkMeta.map((item) => ({
@@ -216,12 +218,20 @@ function Home() {
               />
             </Reveal>
             <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-              {partners.map((p) => (
+              {clients.map((client) => (
                 <div
-                  key={p}
-                  className="flex min-h-[72px] items-center justify-center rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-center text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:border-secondary/40 hover:bg-white/15"
+                  key={client.id ?? client.name}
+                  className="flex min-h-[88px] items-center justify-center rounded-lg border border-white/20 bg-white/10 px-4 py-4 backdrop-blur-sm transition-colors hover:border-secondary/40 hover:bg-white/15"
                 >
-                  {p}
+                  {client.logo ? (
+                    <img
+                      src={client.logo}
+                      alt={client.name}
+                      className="max-h-12 w-full object-contain brightness-0 invert"
+                    />
+                  ) : (
+                    <span className="text-center text-sm font-semibold text-white">{client.name}</span>
+                  )}
                 </div>
               ))}
             </div>
@@ -237,7 +247,7 @@ function Home() {
           </Reveal>
           <div className="mt-10 grid gap-6 md:grid-cols-3">
             {testimonials.map((t, i) => (
-              <Reveal key={t.name} delay={i * 0.08}>
+              <Reveal key={t.id ?? t.name} delay={i * 0.08}>
                 <Card className="h-full border-border/60 bg-white shadow-sm">
                   <CardContent className="p-6 sm:p-8">
                     <div className="flex gap-0.5 text-secondary">
@@ -248,7 +258,11 @@ function Home() {
                     <p className="mt-4 text-sm leading-relaxed text-muted-foreground">"{t.quote}"</p>
                     <div className="mt-6 flex items-center gap-3">
                       <div className="h-12 w-12 overflow-hidden rounded-full bg-muted ring-2 ring-secondary/20">
-                        <img src={images.team[i]} alt="" className="h-full w-full object-cover" />
+                        <img
+                          src={t.image ?? images.team[i] ?? images.team[0]}
+                          alt={t.name}
+                          className="h-full w-full object-cover"
+                        />
                       </div>
                       <div>
                         <div className="font-semibold text-sm">{t.name}</div>

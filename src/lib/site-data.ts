@@ -493,18 +493,21 @@ export const testimonials = [
     role: "Director, Ministry of Planning",
     quote:
       "PointBridge delivered rigorous evaluations with discipline and integrity in one of our most complex reform programmes.",
+    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&q=80",
   },
   {
     name: "Mark Johansson",
     role: "Country Director, INGO",
     quote:
       "Their M&E framework changed how we report results to donors — clear, defensible, and on time.",
+    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80",
   },
   {
     name: "Hodan Ahmed",
     role: "Programme Manager, UN Agency",
     quote:
       "Rigorous, ethical and locally grounded. Exactly what fragile contexts need from an advisory partner.",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80",
   },
 ];
 

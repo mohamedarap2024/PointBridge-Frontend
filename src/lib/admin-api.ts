@@ -65,6 +65,8 @@ export type AdminStats = {
   testimonials: { total: number; pending: number };
   images: { total: number };
   users: { total: number };
+  team: { total: number };
+  clients: { total: number };
 };
 
 export type ContactMessage = {
@@ -83,6 +85,7 @@ export type Testimonial = {
   name: string;
   role: string;
   quote: string;
+  image: string | null;
   approved: boolean;
   createdAt: string;
 };
@@ -93,6 +96,26 @@ export type SiteImage = {
   label: string;
   url: string;
   category: string;
+  updatedAt: string;
+};
+
+export type TeamMember = {
+  id: string;
+  name: string;
+  role: string;
+  bio: string;
+  image: string;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ClientLogo = {
+  id: string;
+  name: string;
+  logo: string | null;
+  sortOrder: number;
+  createdAt: string;
   updatedAt: string;
 };
 
@@ -115,12 +138,12 @@ export const adminApi = {
   deleteContact: (id: string) =>
     api<{ ok: true }>(`/api/admin/contacts/${id}`, { method: "DELETE" }),
   testimonials: () => api<{ items: Testimonial[] }>("/api/admin/testimonials"),
-  createTestimonial: (data: Pick<Testimonial, "name" | "role" | "quote" | "approved">) =>
+  createTestimonial: (data: Pick<Testimonial, "name" | "role" | "quote" | "approved" | "image">) =>
     api<{ item: Testimonial }>("/api/admin/testimonials", {
       method: "POST",
       body: JSON.stringify(data),
     }),
-  updateTestimonial: (id: string, data: Partial<Pick<Testimonial, "name" | "role" | "quote" | "approved">>) =>
+  updateTestimonial: (id: string, data: Partial<Pick<Testimonial, "name" | "role" | "quote" | "approved" | "image">>) =>
     api<{ item: Testimonial }>(`/api/admin/testimonials/${id}`, {
       method: "PATCH",
       body: JSON.stringify(data),
@@ -140,6 +163,35 @@ export const adminApi = {
     }),
   deleteImage: (id: string) =>
     api<{ ok: true }>(`/api/admin/images/${id}`, { method: "DELETE" }),
+  team: () => api<{ items: TeamMember[] }>("/api/admin/team"),
+  createTeamMember: (data: Pick<TeamMember, "name" | "role" | "bio" | "image" | "sortOrder">) =>
+    api<{ item: TeamMember }>("/api/admin/team", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  updateTeamMember: (
+    id: string,
+    data: Partial<Pick<TeamMember, "name" | "role" | "bio" | "image" | "sortOrder">>,
+  ) =>
+    api<{ item: TeamMember }>(`/api/admin/team/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+  deleteTeamMember: (id: string) =>
+    api<{ ok: true }>(`/api/admin/team/${id}`, { method: "DELETE" }),
+  clients: () => api<{ items: ClientLogo[] }>("/api/admin/clients"),
+  createClient: (data: Pick<ClientLogo, "name" | "logo" | "sortOrder">) =>
+    api<{ item: ClientLogo }>("/api/admin/clients", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  updateClient: (id: string, data: Partial<Pick<ClientLogo, "name" | "logo" | "sortOrder">>) =>
+    api<{ item: ClientLogo }>(`/api/admin/clients/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+  deleteClient: (id: string) =>
+    api<{ ok: true }>(`/api/admin/clients/${id}`, { method: "DELETE" }),
   users: () => api<{ items: AdminUser[] }>("/api/admin/users"),
   createUser: (data: { name: string; email: string; password: string; role: "admin" | "user" }) =>
     api<{ item: AdminUser }>("/api/admin/users", {
@@ -161,6 +213,14 @@ export async function fetchPublicImages() {
 
 export async function fetchPublicTestimonials() {
   return api<{ items: Testimonial[] }>("/api/content/testimonials");
+}
+
+export async function fetchPublicTeamMembers() {
+  return api<{ items: TeamMember[] }>("/api/content/team");
+}
+
+export async function fetchPublicClients() {
+  return api<{ items: ClientLogo[] }>("/api/content/clients");
 }
 
 export async function submitFeedback(data: { name: string; role: string; quote: string }) {
